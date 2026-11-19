@@ -7886,8 +7886,320 @@ document.addEventListener('mouseover', function (e) {
 @media (max-width: 700px) and (prefers-reduced-motion: reduce) {
     .nav-group-children, .docs-subnav, .docs-sub-group-items { transition: none !important; animation: none !important; }
 }
+
+/* ════ DESKTOP: nicer gradient borders on the main sidebar badges ════ */
+@media (min-width: 701px) {
+    .sidebar .nav-btn,
+    .sidebar .nav-group-header {
+        border-color: transparent !important;
+        border-radius: 12px !important;
+        background: rgba(255, 255, 255, 0.04) !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18) !important;
+        transition: background .25s ease, box-shadow .25s ease, transform .3s cubic-bezier(0.34,1.3,0.64,1) !important;
+    }
+    /* the border itself: a thin cyan -> violet gradient ring drawn with a mask */
+    .sidebar .nav-btn::before,
+    .sidebar .nav-group-header::before {
+        content: ''; position: absolute; inset: 0; border-radius: inherit; padding: 1px;
+        background: linear-gradient(135deg,
+            rgba(125, 211, 252, 0.65) 0%,
+            rgba(125, 211, 252, 0.14) 38%,
+            rgba(167, 139, 250, 0.14) 62%,
+            rgba(167, 139, 250, 0.55) 100%);
+        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        -webkit-mask-composite: xor;
+        mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+        pointer-events: none; opacity: .9; transition: opacity .25s ease;
+    }
+    /* hover */
+    .sidebar .nav-btn:hover,
+    .sidebar .nav-group-header:hover {
+        background: rgba(56, 189, 248, 0.09) !important;
+        box-shadow: 0 0 14px rgba(56, 189, 248, 0.18), 0 4px 14px rgba(0, 0, 0, 0.22) !important;
+    }
+    .sidebar .nav-btn:hover::before,
+    .sidebar .nav-group-header:hover::before { opacity: 1; }
+    /* active / open: brighter cyan ring + soft glow */
+    .sidebar .nav-btn.active,
+    .sidebar .nav-group-header.open,
+    .sidebar .nav-btn.bts-open {
+        background: linear-gradient(90deg, rgba(56, 189, 248, 0.2) 0%, rgba(56, 189, 248, 0.05) 100%) !important;
+        box-shadow: 0 0 18px rgba(56, 189, 248, 0.25), 0 4px 14px rgba(0, 0, 0, 0.25) !important;
+    }
+    .sidebar .nav-btn.active::before,
+    .sidebar .nav-group-header.open::before,
+    .sidebar .nav-btn.bts-open::before {
+        background: linear-gradient(135deg,
+            rgba(56, 189, 248, 0.95) 0%,
+            rgba(56, 189, 248, 0.4) 50%,
+            rgba(125, 211, 252, 0.8) 100%);
+        opacity: 1;
+    }
+}
+
+/* ════ NAVIGATION BAR: cyan #06b6d4 theme — deep (top / left) to light (bottom / right) ════ */
+.sidebar {
+    background: linear-gradient(180deg, #0b5a73 0%, #0891b2 52%, #06b6d4 100%) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.22) !important;
+    box-shadow: 4px 0 24px rgba(6, 70, 95, 0.35) !important;
+}
+.sidebar .brand-sub, .sidebar .nav-section-label { color: rgba(255, 255, 255, 0.78) !important; }
+.sidebar .brand-title { background: linear-gradient(90deg, #ffffff 0%, #d9f7ff 100%) !important; -webkit-background-clip: text !important; background-clip: text !important; -webkit-text-fill-color: transparent !important; }
+.sidebar .sidebar-brand, .sidebar .sidebar-footer { border-color: rgba(255, 255, 255, 0.22) !important; }
+.sidebar .nav-text .tab-name,
+.sidebar .nav-group-header .tab-name,
+.sidebar .nav-btn.active .nav-text .tab-name,
+.sidebar .nav-group-header.open .tab-name,
+.sidebar .nav-btn.bts-open .tab-name {
+    color: #ffffff !important; text-shadow: 0 1px 3px rgba(4, 50, 68, 0.45) !important;
+}
+.sidebar .nav-text .tab-desc { color: rgba(255, 255, 255, 0.85) !important; opacity: 1 !important; text-shadow: 0 1px 2px rgba(4, 50, 68, 0.35); }
+.sidebar .nav-group-arrow { color: rgba(255, 255, 255, 0.85) !important; }
+.sidebar .author-name { color: #ffffff !important; text-shadow: 0 1px 2px rgba(4, 50, 68, 0.45); }
+.sidebar .author-role { color: rgba(255, 255, 255, 0.85) !important; text-shadow: 0 1px 2px rgba(4, 50, 68, 0.35); }
+
+@media (min-width: 701px) {
+    /* badges: deep glass fill + white ring so they stand out on cyan */
+    .sidebar .nav-btn,
+    .sidebar .nav-group-header {
+        background: rgba(4, 47, 64, 0.28) !important;
+        box-shadow: 0 2px 8px rgba(4, 50, 68, 0.25) !important;
+    }
+    .sidebar .nav-btn::before,
+    .sidebar .nav-group-header::before {
+        background: linear-gradient(135deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0.2) 40%, rgba(255,255,255,0.2) 62%, rgba(255,255,255,0.6) 100%) !important;
+    }
+    .sidebar .nav-btn:hover,
+    .sidebar .nav-group-header:hover {
+        background: rgba(4, 47, 64, 0.42) !important;
+        box-shadow: 0 0 14px rgba(255, 255, 255, 0.22), 0 4px 14px rgba(4, 50, 68, 0.3) !important;
+    }
+    .sidebar .nav-btn.active,
+    .sidebar .nav-group-header.open,
+    .sidebar .nav-btn.bts-open {
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.1) 100%) !important;
+        box-shadow: 0 0 18px rgba(255, 255, 255, 0.3), 0 4px 14px rgba(4, 50, 68, 0.3) !important;
+    }
+    .sidebar .nav-btn.active::before,
+    .sidebar .nav-group-header.open::before,
+    .sidebar .nav-btn.bts-open::before {
+        background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.55) 50%, #ffffff 100%) !important;
+    }
+    /* sub badge panels on the cyan bar */
+    body .nav-group-children,
+    body .docs-subnav,
+    body .bts-flyout.open {
+        background: rgba(4, 47, 64, 0.32) !important;
+        border-color: rgba(255, 255, 255, 0.28) !important;
+    }
+    body .docs-subnav .docs-sub-group-header,
+    body .nav-group-children .nav-child-btn,
+    body .bts-flyout .bts-sub-row { background: rgba(255, 255, 255, 0.12) !important; color: #ffffff !important; }
+    body .docs-subnav .docs-sub-group-header:hover,
+    body .nav-group-children .nav-child-btn:hover,
+    body .bts-flyout .bts-sub-row:hover { background: rgba(255, 255, 255, 0.24) !important; }
+    body .docs-subnav .docs-sub-group-header.open,
+    body .nav-group-children .nav-child-btn.active { background: rgba(255, 255, 255, 0.34) !important; }
+    body .docs-subnav .docs-sub-group-header::before,
+    body .bts-flyout .bts-sub-row::before { background: rgba(255, 255, 255, 0.7); }
+    body .docs-subnav .docs-sub-group-header.open::before { background: #ffffff; box-shadow: 0 0 8px #ffffff; }
+    body .docs-subnav .docs-sub-group-header::after,
+    body .bts-flyout .bts-sub-row::after { background: rgba(255, 255, 255, 0.22) !important; color: #ffffff !important; }
+    body .docs-subnav .docs-sub-group-header.open::after { background: #ffffff !important; color: #0b5a73 !important; }
+}
+
+@media (max-width: 700px) {
+    /* bottom bar: deep (left) -> light (right) */
+    .sidebar {
+        background: linear-gradient(90deg, #0b5a73 0%, #0891b2 55%, #06b6d4 100%) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.3) !important;
+        box-shadow: 0 -6px 24px rgba(6, 70, 95, 0.35) !important;
+    }
+    .sidebar .nav-group-header .tab-name,
+    .sidebar .nav-group-header.open .tab-name,
+    .sidebar .nav-btn .tab-name { color: #ffffff !important; }
+    .sidebar .nav-btn.active,
+    .sidebar .nav-group-header.open { background: rgba(255, 255, 255, 0.24) !important; box-shadow: 0 2px 10px rgba(4, 50, 68, 0.25) !important; }
+}
+
+/* ════ DESKTOP: cyan-mixed badges & sub badges — NO borders, depth from shadows ════ */
+@media (min-width: 701px) {
+    /* remove the ring borders */
+    .sidebar .nav-btn::before,
+    .sidebar .nav-group-header::before { display: none !important; }
+    .sidebar .nav-btn,
+    .sidebar .nav-group-header {
+        border: none !important;
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.62) 0%, rgba(8, 145, 178, 0.42) 100%) !important;
+        box-shadow: 0 6px 14px rgba(3, 45, 62, 0.35),
+                    0 1px 3px rgba(3, 45, 62, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+                    inset 0 -2px 5px rgba(3, 45, 62, 0.22) !important;
+    }
+    .sidebar .nav-btn:hover,
+    .sidebar .nav-group-header:hover {
+        background: linear-gradient(135deg, rgba(8, 145, 178, 0.7) 0%, rgba(34, 211, 238, 0.48) 100%) !important;
+        box-shadow: 0 9px 20px rgba(3, 45, 62, 0.42),
+                    0 2px 4px rgba(3, 45, 62, 0.3),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.32),
+                    inset 0 -2px 5px rgba(3, 45, 62, 0.18) !important;
+    }
+    /* active / open: lighter cyan, slightly pressed + soft light glow */
+    .sidebar .nav-btn.active,
+    .sidebar .nav-group-header.open,
+    .sidebar .nav-btn.bts-open {
+        background: linear-gradient(135deg, rgba(103, 232, 249, 0.6) 0%, rgba(6, 182, 212, 0.55) 100%) !important;
+        box-shadow: 0 0 18px rgba(165, 243, 252, 0.45),
+                    0 4px 10px rgba(3, 45, 62, 0.3),
+                    inset 0 2px 5px rgba(3, 45, 62, 0.28),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    }
+
+    /* sub badge panel: recessed tray, no border */
+    body .nav-group-children,
+    body .docs-subnav,
+    body .bts-flyout.open {
+        background: rgba(3, 45, 62, 0.28) !important;
+        border: none !important;
+        border-left: none !important;
+        box-shadow: inset 0 3px 10px rgba(3, 45, 62, 0.4), inset 0 -1px 0 rgba(255, 255, 255, 0.12) !important;
+    }
+    /* sub badge rows: small raised cyan pills */
+    body .docs-subnav .docs-sub-group-header,
+    body .nav-group-children .nav-child-btn,
+    body .bts-flyout .bts-sub-row {
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.7) 0%, rgba(8, 145, 178, 0.5) 100%) !important;
+        border: none !important;
+        box-shadow: 0 3px 8px rgba(3, 45, 62, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+        color: #ffffff !important;
+    }
+    body .docs-subnav .docs-sub-group-header:hover,
+    body .nav-group-children .nav-child-btn:hover,
+    body .bts-flyout .bts-sub-row:hover {
+        background: linear-gradient(135deg, rgba(8, 145, 178, 0.8) 0%, rgba(34, 211, 238, 0.55) 100%) !important;
+        box-shadow: 0 5px 12px rgba(3, 45, 62, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    }
+    body .docs-subnav .docs-sub-group-header.open,
+    body .nav-group-children .nav-child-btn.active {
+        background: linear-gradient(135deg, rgba(103, 232, 249, 0.65) 0%, rgba(6, 182, 212, 0.6) 100%) !important;
+        box-shadow: 0 0 12px rgba(165, 243, 252, 0.4), inset 0 2px 4px rgba(3, 45, 62, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    }
+}
+
+/* ════ NAV BAR: deeper bottom (less light) ════ */
+.sidebar { background: linear-gradient(180deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%) !important; }
+@media (max-width: 700px) {
+    .sidebar { background: linear-gradient(90deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%) !important; }
+}
+
+/* ════ BTS / Radio / command tabs & buttons: same cyan theme as the navigation bar ════ */
+.olt-bts-btn:not(.radio-deleted-btn),
+.bts-cmd-vendor {
+    background: linear-gradient(135deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%) !important;
+    border: 1.5px solid #084a5f !important;
+    box-shadow: 0 3px 10px rgba(6, 90, 115, 0.3) !important;
+}
+.olt-bts-btn:not(.radio-deleted-btn):hover {
+    border-color: #67e8f9 !important;
+    box-shadow: 0 6px 18px rgba(8, 145, 178, 0.45) !important;
+}
+#app-radio .radio-bts-cell.pop-open > .olt-bts-btn { border-color: #67e8f9 !important; box-shadow: 0 0 0 3px rgba(103, 232, 249, 0.35), 0 6px 18px rgba(8, 145, 178, 0.45) !important; }
+.olt-bts-btn .obb-count { color: #d9f7ff; }
+.olt-tool-btn.edit { background: linear-gradient(135deg, #0891b2, #0b5a73) !important; }
+.olt-mode-hint.edit, #app-radio .olt-mode-hint.edit { color: #0b5a73 !important; }
+.olt-row-btn { color: #0891b2; background: rgba(8, 145, 178, 0.12); }
+/* modal headers / save buttons that used the old blue-teal gradient */
+.radio-modal-header[style*="0b3d91"] { background: linear-gradient(135deg, #0b5a73 0%, #0891b2 100%) !important; }
+.radio-modal-btn.save[style*="0b3d91"] { background: linear-gradient(135deg, #0b5a73, #0891b2) !important; }
+
+/* ════ DESKTOP: Troubleshoot / Installation flyout + GPON/EPON header — same cyan theme, shadows instead of borders ════ */
+@media (min-width: 701px) {
+    body .docs-subnav .docs-sub-group-items.open {
+        background: linear-gradient(135deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%) !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 5px !important;
+        gap: 3px !important;
+        box-shadow: 0 10px 24px rgba(3, 45, 62, 0.45), 0 2px 6px rgba(3, 45, 62, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+    }
+    body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf {
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(3, 45, 62, 0.4) !important;
+        background: rgba(255, 255, 255, 0.1) !important;
+        border: none !important;
+        border-radius: 7px !important;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+    }
+    body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf::before { background: rgba(255, 255, 255, 0.75) !important; box-shadow: none !important; }
+    body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf:hover {
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.24) !important;
+        box-shadow: 0 3px 8px rgba(3, 45, 62, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.28) !important;
+    }
+    body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf:hover::before { background: #ffffff !important; box-shadow: 0 0 6px #ffffff !important; }
+    body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf.active {
+        color: #ffffff !important;
+        text-shadow: 0 1px 2px rgba(3, 45, 62, 0.4) !important;
+        background: linear-gradient(135deg, rgba(103, 232, 249, 0.6) 0%, rgba(6, 182, 212, 0.55) 100%) !important;
+        box-shadow: 0 0 10px rgba(165, 243, 252, 0.4), inset 0 2px 4px rgba(3, 45, 62, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    }
+    body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf.active::before { background: #ffffff !important; box-shadow: 0 0 6px #ffffff !important; }
+
+    /* GPON OLT / EPON OLT header row (when EPON is shown) */
+    body .docs-subnav .docs-subnav-header {
+        background: linear-gradient(135deg, rgba(14, 116, 144, 0.7) 0%, rgba(8, 145, 178, 0.5) 100%) !important;
+        border: none !important;
+        border-radius: 9px !important;
+        color: #ffffff !important;
+        box-shadow: 0 3px 8px rgba(3, 45, 62, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
+    }
+    body .docs-subnav .docs-subnav-header:hover { background: linear-gradient(135deg, rgba(8, 145, 178, 0.8) 0%, rgba(34, 211, 238, 0.55) 100%) !important; }
+    body .docs-subnav .docs-subnav-header.open {
+        background: linear-gradient(135deg, rgba(103, 232, 249, 0.65) 0%, rgba(6, 182, 212, 0.6) 100%) !important;
+        box-shadow: 0 0 12px rgba(165, 243, 252, 0.4), inset 0 2px 4px rgba(3, 45, 62, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+    }
+    body .docs-subnav .docs-subnav-header .sub-arrow { background: rgba(255, 255, 255, 0.22) !important; color: #ffffff !important; }
+    body .docs-subnav .docs-subnav-items.open { border-left-color: rgba(255, 255, 255, 0.35) !important; }
+}
 </style>
 
+
+<style>
+/* ════ SAVED SCRIPTS MODALS (ONU + Line Profile): same cyan theme as the navigation bar ════ */
+#onu-saved-modal .onu-modal-box, #lp-saved-modal .onu-modal-box,
+#onu-script-view-modal .onu-modal-box, #lp-script-view-modal .onu-modal-box {
+    background: linear-gradient(180deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%) !important;
+    border: 1px solid rgba(255,255,255,0.22) !important;
+    box-shadow: 0 20px 60px rgba(6,70,95,0.5) !important;
+}
+#onu-saved-modal .onu-modal-head, #lp-saved-modal .onu-modal-head,
+#onu-script-view-modal .onu-modal-head, #lp-script-view-modal .onu-modal-head {
+    border-bottom: 1px solid rgba(255,255,255,0.22) !important;
+}
+#onu-saved-modal .card-head-text, #lp-saved-modal .card-head-text,
+#onu-script-view-modal .card-head-text, #lp-script-view-modal .card-head-text { color: #ffffff !important; }
+#onu-saved-modal .ch-icon, #lp-saved-modal .ch-icon,
+#onu-script-view-modal .ch-icon, #lp-script-view-modal .ch-icon { background: rgba(255,255,255,0.22) !important; color: #ffffff !important; }
+#onu-saved-modal .onu-modal-close, #lp-saved-modal .onu-modal-close,
+#onu-script-view-modal .onu-modal-close, #lp-script-view-modal .onu-modal-close { border-color: rgba(255,255,255,0.35) !important; color: #ffffff !important; }
+#onu-saved-modal .onu-saved-item, #lp-saved-modal .onu-saved-item { background: rgba(255,255,255,0.12) !important; border-color: rgba(255,255,255,0.26) !important; }
+#onu-saved-modal .onu-saved-item:hover, #lp-saved-modal .onu-saved-item:hover { background: rgba(255,255,255,0.2) !important; }
+#onu-saved-modal .onu-saved-item .osi-name, #lp-saved-modal .onu-saved-item .osi-name { color: #ffffff !important; }
+#onu-saved-modal .onu-saved-item .osi-meta, #lp-saved-modal .onu-saved-item .osi-meta { color: rgba(255,255,255,0.8) !important; }
+#onu-saved-modal .osi-actions button, #lp-saved-modal .osi-actions button { border-color: rgba(255,255,255,0.35) !important; color: #ffffff !important; }
+#onu-saved-modal .osi-actions button:hover, #lp-saved-modal .osi-actions button:hover { background: rgba(255,255,255,0.22) !important; }
+#onu-saved-modal .osi-actions button.osi-del:hover, #lp-saved-modal .osi-actions button.osi-del:hover { background: rgba(239,68,68,0.3) !important; border-color: rgba(254,202,202,0.7) !important; color: #fecaca !important; }
+#onu-saved-modal .onu-saved-search input, #lp-saved-modal .onu-saved-search input { background: rgba(255,255,255,0.16) !important; border-color: rgba(255,255,255,0.4) !important; color: #ffffff !important; }
+#onu-saved-modal .onu-saved-search input::placeholder, #lp-saved-modal .onu-saved-search input::placeholder { color: rgba(255,255,255,0.75) !important; }
+#onu-saved-modal .onu-saved-search .material-icons, #lp-saved-modal .onu-saved-search .material-icons { color: #ffffff !important; }
+#onu-saved-modal .onu-saved-empty, #lp-saved-modal .onu-saved-empty { color: rgba(255,255,255,0.8) !important; }
+#onu-script-view-modal .onu-view-meta, #lp-script-view-modal .onu-view-meta { color: rgba(255,255,255,0.8) !important; }
+#onu-script-view-modal .onu-view-actions, #lp-script-view-modal .onu-view-actions { border-top-color: rgba(255,255,255,0.22) !important; }
+#onu-script-view-modal .onu-view-actions .btn, #lp-script-view-modal .onu-view-actions .btn { background: rgba(255,255,255,0.18) !important; color: #ffffff !important; }
+#onu-script-view-modal .onu-view-actions .btn:hover, #lp-script-view-modal .onu-view-actions .btn:hover { background: rgba(255,255,255,0.3) !important; }
+#onu-script-view-modal .onu-view-actions .btn.btn-cpy, #lp-script-view-modal .onu-view-actions .btn.btn-cpy { background: linear-gradient(135deg,#0e7490,#06b6d4) !important; color: #ffffff !important; }
+#onu-script-view-modal textarea.onu-view-textarea, #lp-script-view-modal textarea.onu-view-textarea { background: rgba(4,40,56,0.35) !important; border-color: rgba(255,255,255,0.25) !important; color: #ecfeff !important; }
+</style>
 </body>
 </html>
 </div>
