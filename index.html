@@ -8311,13 +8311,13 @@ document.addEventListener('mouseover', function (e) {
 @media (max-width: 700px) {
     #d_olt_ips #olt-bts-detail.olt-sheet {
         position: fixed; left: 8px; right: 8px; z-index: 60;
-        max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+        max-height: calc(100vh - 250px); overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
         background: #ffffff; border-radius: 16px 16px 0 0; padding: 4px 8px 6px;
         border: 1px solid #cbd5e1; border-bottom: none;
         box-shadow: 0 -8px 26px rgba(3, 45, 62, 0.28);
-        animation: oltSheetUp .55s cubic-bezier(0.16, 1, 0.3, 1) both; will-change: transform, opacity;
+        animation: oltSheetUp .6s cubic-bezier(0.22, 0.9, 0.3, 1) both; will-change: transform, opacity;
     }
-    #d_olt_ips #olt-bts-detail.olt-sheet.olt-closing { animation: oltSheetDown .3s cubic-bezier(0.5, 0, 0.75, 0) both !important; pointer-events: none; }
+    #d_olt_ips #olt-bts-detail.olt-sheet.olt-closing { animation: oltSheetDown .4s cubic-bezier(0.4, 0, 0.6, 1) both !important; pointer-events: none; }
     /* table rows glide in one after another */
     #d_olt_ips #olt-bts-detail.olt-sheet tbody tr { animation: oltRowIn .5s cubic-bezier(0.22, 0.9, 0.3, 1) both; animation-delay: calc(var(--ri, 0) * 55ms + 160ms); }
     #d_olt_ips #olt-bts-detail.olt-sheet.olt-closing tbody tr { animation: none; }
@@ -8347,8 +8347,8 @@ document.addEventListener('mouseover', function (e) {
     #d_olt_ips.olt-sheet-open .olt-bts-btn .obb-name { font-size: var(--f-name, 0.85rem) !important; line-height: 1.15 !important; }
     #d_olt_ips.olt-sheet-open .olt-bts-btn .obb-count { font-size: var(--f-count, 0.68rem) !important; line-height: 1.1 !important; }
 }
-@keyframes oltSheetUp { from { transform: translateY(105%); opacity: .85; } to { transform: translateY(0); opacity: 1; } }
-@keyframes oltSheetDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(105%); opacity: .85; } }
+@keyframes oltSheetUp { from { transform: translateY(110%); opacity: 0; } 35% { opacity: 1; } to { transform: translateY(0); opacity: 1; } }
+@keyframes oltSheetDown { from { transform: translateY(0); opacity: 1; } 65% { opacity: 1; } to { transform: translateY(110%); opacity: 0; } }
 @keyframes oltSheetSwap { from { opacity: .55; } to { opacity: 1; } }
 @keyframes oltRowIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
 </style>
@@ -8378,57 +8378,35 @@ document.addEventListener('mouseover', function (e) {
     function snap(pg) { return { open: pg.classList.contains('olt-sheet-open'), v: FV.map(function (n) { return pg.style.getPropertyValue(n); }) }; }
     function restore(pg, st) { pg.classList.toggle('olt-sheet-open', st.open); FV.forEach(function (n, i) { if (st.v[i]) pg.style.setProperty(n, st.v[i]); else pg.style.removeProperty(n); }); }
     function place() {
+        /* BTS boxes keep their normal size & font. Only the data sheet moves (rises from the bottom / drops back down). */
         var s = sheet(), bar = document.querySelector('.sidebar'), pg = document.getElementById('d_olt_ips'), list = document.getElementById('olt-bts-buttons');
         if (!s || !s.classList.contains('olt-sheet') || !bar || !pg || !list) return;
-        s.style.bottom = Math.max(0, window.innerHeight - bar.getBoundingClientRect().top) + 'px';
+        applyLevel(pg, 0);                                   // boxes: untouched
         list.style.marginBottom = '';
-        var pre = snap(pg); pg.classList.add('olt-measure');   // measure without transitions, then animate pre -> final
         var sc = document.getElementById('docs-content-scroll'); if (sc) sc.scrollTop = 0;
-        // balanced steps: box size and table font shrink together (table font is capped, boxes never get tiny)
+        var barTop = bar.getBoundingClientRect().top;
+        s.style.bottom = Math.max(0, window.innerHeight - barTop) + 'px';
+        var avail = barTop - list.getBoundingClientRect().bottom - 10;
+        s.style.maxHeight = Math.max(180, avail) + 'px';     // sheet stays below the boxes, scrolls inside if the data is long
+        // only the table text may adapt (to avoid sideways scrolling); it never goes below a readable size
         var STEPS = [
-            { lv: 5, t: {fs:1,   pad:10,  px:6} },
-            { lv: 5, t: {fs:.96, pad:9,   px:6} },
-            { lv: 6, t: {fs:.94, pad:8.5, px:6} },
-            { lv: 6, t: {fs:.92, pad:8,   px:6} },
-            { lv: 7, t: {fs:.9,  pad:7.5, px:6} },
-            { lv: 0, t: {fs:.88, pad:7,   px:6} },
-            { lv: 1, t: {fs:.86, pad:7,   px:6} },
-            { lv: 2, t: {fs:.84, pad:6.5, px:6} },
-            { lv: 3, t: {fs:.82, pad:6,   px:6} },
-            { lv: 3, t: {fs:.80, pad:6,   px:6} },
-            { lv: 4, t: {fs:.78, pad:5.5, px:6} },
-            { lv: 4, t: {fs:.75, pad:5,   px:5} },
-            { lv: 4, t: {fs:.72, pad:5,   px:5} },
-            { lv: 4, t: {fs:.69, pad:4.5, px:4} },
-            { lv: 4, t: {fs:.66, pad:4,   px:3} },
-            { lv: 4, t: {fs:.62, pad:4,   px:2} }
+            { fs: .9,  pad: 8,   px: 8 }, { fs: .86, pad: 7,   px: 7 }, { fs: .82, pad: 6.5, px: 6 },
+            { fs: .78, pad: 6,   px: 5 }, { fs: .74, pad: 5.5, px: 4 }, { fs: .7,  pad: 5,   px: 3 }
         ];
-        function setTbl(t, extra) { pg.style.setProperty('--t-fs', t.fs + 'rem'); pg.style.setProperty('--t-pad', (t.pad + extra) + 'px'); pg.style.setProperty('--t-px', t.px + 'px'); }
-        function gapPx() { return (bar.getBoundingClientRect().top - s.offsetHeight) - list.getBoundingClientRect().bottom - 8; }
-        var fits = false, si;
-        for (si = 0; si < STEPS.length && !fits; si++) {
-            applyLevel(pg, STEPS[si].lv); setTbl(STEPS[si].t, 0);
-            fits = gapPx() >= 0 && s.scrollWidth <= s.clientWidth + 1;
+        function setTbl(t) { pg.style.setProperty('--t-fs', t.fs + 'rem'); pg.style.setProperty('--t-pad', t.pad + 'px'); pg.style.setProperty('--t-px', t.px + 'px'); }
+        var pick = null, i;
+        for (i = 0; i < STEPS.length; i++) {                 // 1st choice: fits width AND height
+            setTbl(STEPS[i]);
+            if (s.scrollWidth <= s.clientWidth + 1 && s.scrollHeight <= s.clientHeight + 1) { pick = i; break; }
         }
-        if (fits) {                                   // spend the leftover space: roomier boxes + roomier table rows (no big empty gap)
-            var rows = 1; Array.prototype.forEach.call(document.querySelectorAll('#docs-olt-ip-tbody tr'), function (r) { if (r.style.display !== 'none') rows++; });
-            var st = STEPS[si - 1], L = LEVELS[st.lv], g = gapPx();
-            var nb = document.querySelectorAll('#olt-bts-buttons .olt-bts-btn').length, brows = Math.max(1, Math.ceil(nb / 2));
-            var bx = Math.max(0, Math.min(5, Math.floor(g * 0.4 / (brows * 2) * 2) / 2));
-            var tx = Math.max(0, Math.min(9, Math.floor(g * 0.6 / (rows * 2) * 2) / 2));
-            function withExtra(bx, tx) {
-                if (L) { var pp = L.pad.split(' '); pg.style.setProperty('--f-pad', (parseFloat(pp[0]) + bx) + 'px ' + pp[1]); }
-                setTbl(st.t, tx);
+        if (pick === null) {                                 // 2nd choice: fits width (height scrolls)
+            for (i = 0; i < STEPS.length; i++) {
+                if (STEPS[i].fs < .78 && i > 0) { /* keep readable */ }
+                setTbl(STEPS[i]);
+                if (s.scrollWidth <= s.clientWidth + 1) { pick = i; break; }
             }
-            withExtra(bx, tx);
-            if (gapPx() < 0) withExtra(Math.max(0, bx - 2), Math.max(0, tx - 2));
-            if (gapPx() < 0) withExtra(0, 0);
-        } else { applyLevel(pg, 4); setTbl(STEPS[STEPS.length - 1].t, 0); }
-        if (!fits) list.style.marginBottom = (s.offsetHeight + 12) + 'px';   // still too tall: list can scroll clear of the sheet
-        var post = snap(pg);
-        restore(pg, pre); void pg.offsetWidth;          // back to the starting look (no transition running)
-        pg.classList.remove('olt-measure'); void pg.offsetWidth;
-        restore(pg, post);                              // now the BTS boxes glide to the fitted size
+        }
+        setTbl(STEPS[pick === null ? STEPS.length - 1 : pick]);
     }
     function mark(name) {
         document.querySelectorAll('#olt-bts-buttons .olt-bts-btn').forEach(function (b) {
@@ -8467,7 +8445,7 @@ document.addEventListener('mouseover', function (e) {
         if (!mobile() || !s || !pg || !s.classList.contains('olt-sheet') || s.style.display === 'none') { clearSheet(); return origBack.apply(self, args); }
         applyLevel(pg, 0); mark(null);                  // BTS boxes grow back while the sheet slides down
         s.classList.remove('olt-swap'); s.classList.add('olt-closing');
-        closing = { fn: function () { clearSheet(); origBack.apply(self, args); }, t: setTimeout(finishClose, 300) };
+        closing = { fn: function () { clearSheet(); origBack.apply(self, args); }, t: setTimeout(finishClose, 400) };
     };
     window.addEventListener('resize', function () { if (!mobile()) clearSheet(); else place(); });
     window.addEventListener('orientationchange', function () { setTimeout(place, 250); });
