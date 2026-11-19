@@ -8335,6 +8335,7 @@ document.addEventListener('mouseover', function (e) {
     #d_olt_ips #olt-bts-detail.olt-sheet .olt-back-btn .material-icons { font-size: 15px !important; }
     #d_olt_ips #olt-bts-detail.olt-sheet .olt-detail-title { font-size: 0.88rem !important; }
     #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table th { white-space: nowrap !important; padding: var(--t-pad, 5px) var(--t-px, 6px) !important; font-size: calc(var(--t-fs, 0.76rem) - 0.08rem) !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table td .olt-port { display: block; margin-top: 1px; line-height: 1.15; }
     #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table td { white-space: nowrap !important; padding: var(--t-pad, 5px) var(--t-px, 6px) !important; font-size: var(--t-fs, 0.76rem) !important; line-height: 1.2 !important; }
     /* selected BTS: same look as the existing hover state (no new colours) */
     #d_olt_ips .olt-bts-btn.olt-sel { border-color: #67e8f9 !important; box-shadow: 0 6px 18px rgba(8, 145, 178, 0.45) !important; }
@@ -8386,26 +8387,34 @@ document.addEventListener('mouseover', function (e) {
         var sc = document.getElementById('docs-content-scroll'); if (sc) sc.scrollTop = 0;
         var barTop = bar.getBoundingClientRect().top;
         s.style.bottom = Math.max(0, window.innerHeight - barTop) + 'px';
-        var avail = barTop - list.getBoundingClientRect().bottom - 10;
-        s.style.maxHeight = Math.max(180, avail) + 'px';     // sheet stays below the boxes, scrolls inside if the data is long
-        // only the table text may adapt (to avoid sideways scrolling); it never goes below a readable size
+        var avail = barTop - list.getBoundingClientRect().bottom - 12;
+        var maxH = Math.max(180, avail);
+        s.style.maxHeight = maxH + 'px';                     // sheet stays below the boxes, scrolls inside if the data is long
         var STEPS = [
-            { fs: .9,  pad: 8,   px: 8 }, { fs: .86, pad: 7,   px: 7 }, { fs: .82, pad: 6.5, px: 6 },
-            { fs: .78, pad: 6,   px: 5 }, { fs: .74, pad: 5,   px: 4 }, { fs: .7,  pad: 4,   px: 3 }
+            { fs: 1,   pad: 8,   px: 8 }, { fs: .94, pad: 7.5, px: 7 }, { fs: .9,  pad: 7,   px: 6 },
+            { fs: .86, pad: 6.5, px: 6 }, { fs: .82, pad: 6,   px: 5 }, { fs: .78, pad: 5.5, px: 4 },
+            { fs: .74, pad: 5,   px: 4 }, { fs: .7,  pad: 4,   px: 3 }
         ];
-        function setTbl(t) { pg.style.setProperty('--t-fs', t.fs + 'rem'); pg.style.setProperty('--t-pad', t.pad + 'px'); pg.style.setProperty('--t-px', t.px + 'px'); }
-        var pick = null, i;
-        for (i = 0; i < STEPS.length; i++) {                 // 1st choice: fits width AND height
+        function setTbl(t, extra) { pg.style.setProperty('--t-fs', t.fs + 'rem'); pg.style.setProperty('--t-pad', (t.pad + (extra || 0)) + 'px'); pg.style.setProperty('--t-px', t.px + 'px'); }
+        function fitsW() { return s.scrollWidth <= s.clientWidth + 1; }
+        function fitsH() { return s.scrollHeight <= s.clientHeight + 1; }
+        var pick = -1, i;
+        for (i = 0; i < STEPS.length; i++) {                 // largest text that fits width AND height
             setTbl(STEPS[i]);
-            if (s.scrollWidth <= s.clientWidth + 1 && s.scrollHeight <= s.clientHeight + 1) { pick = i; break; }
+            if (fitsW() && fitsH()) { pick = i; break; }
         }
-        if (pick === null) {                                 // 2nd choice: smallest readable table text that still fits the width (rest scrolls inside the sheet)
-            for (i = STEPS.length - 1; i >= 0; i--) {
-                setTbl(STEPS[i]);
-                if (s.scrollWidth <= s.clientWidth + 1) { pick = i; break; }
-            }
+        if (pick < 0) {                                      // otherwise the smallest readable text that fits the width (rest scrolls inside)
+            for (i = STEPS.length - 1; i >= 0; i--) { setTbl(STEPS[i]); if (fitsW()) { pick = i; break; } }
+            if (pick < 0) pick = STEPS.length - 1;
+            setTbl(STEPS[pick]);
+        } else {                                             // spare room under the boxes: make the rows taller so no empty gap is left
+            var rows = 1; Array.prototype.forEach.call(document.querySelectorAll('#docs-olt-ip-tbody tr'), function (r) { if (r.style.display !== 'none') rows++; });
+            var free = maxH - s.offsetHeight;
+            var extra = Math.max(0, Math.min(10, Math.floor(free / (rows * 2) * 2) / 2));
+            setTbl(STEPS[pick], extra);
+            if (!fitsH()) setTbl(STEPS[pick], Math.max(0, extra - 2));
+            if (!fitsH()) setTbl(STEPS[pick], 0);
         }
-        setTbl(STEPS[pick === null ? STEPS.length - 1 : pick]);
     }
     function mark(name) {
         document.querySelectorAll('#olt-bts-buttons .olt-bts-btn').forEach(function (b) {
