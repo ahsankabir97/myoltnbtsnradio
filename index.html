@@ -1968,7 +1968,7 @@ body:not(.show-epon) .docs-grp-epon { display: none !important; }
     .docs-subnav { overflow: visible !important; max-height: none !important; }
     .docs-subnav .docs-sub-group { position: relative; }
     .docs-subnav .docs-sub-group-items {
-        position: absolute !important; top: 0; left: calc(100% + 8px); right: auto;
+        position: absolute !important; top: 0 !important; left: calc(100% + 8px) !important; right: auto !important; bottom: auto !important;
         min-width: 124px; margin: 0 !important; padding: 4px !important;
         background: #dce9fc; border: 1px solid #b4cbef !important; border-radius: 10px;
         box-shadow: 0 6px 20px rgba(15,40,100,0.28); z-index: 30;
@@ -7738,6 +7738,153 @@ document.addEventListener('mouseover', function (e) {
         background: #1b324b !important;
         border-top: 1px solid rgba(148, 197, 248, 0.28) !important;
     }
+}
+
+/* ════ DESKTOP: compact sidebar badges & sub badges (less height) ════ */
+@media (min-width: 701px) {
+    .nav-group { gap: 10px !important; }
+    .nav-btn { padding: 9px 12px !important; gap: 10px !important; }
+    .nav-group-header { padding: 9px 12px !important; gap: 10px !important; }
+    .nav-icon-wrap { width: 26px !important; height: 26px !important; border-radius: 8px !important; font-size: 0.88em !important; }
+    .nav-text .tab-name { line-height: 1.15 !important; }
+    .nav-text .tab-desc { margin-top: 0 !important; line-height: 1.15 !important; }
+    .nav-group-children { gap: 3px !important; padding: 4px 6px 5px 6px !important; margin-bottom: 2px !important; }
+    .nav-child-btn { padding: 5px 10px !important; gap: 8px !important; }
+    .nav-child-icon { width: 20px !important; height: 20px !important; border-radius: 5px !important; }
+    .docs-subnav { margin-top: 4px !important; margin-bottom: 2px !important; padding: 5px 6px 5px 8px !important; }
+    .docs-subnav-inner { gap: 3px !important; }
+    .docs-subnav-items { gap: 3px !important; padding-top: 3px !important; padding-bottom: 2px !important; }
+    .docs-subnav-header { padding: 6px 8px !important; }
+    .docs-sub-group-header { height: 30px !important; min-height: 30px !important; }
+    .docs-sub-group-items.open { gap: 2px !important; }
+    .docs-sub-btn-leaf { padding-top: 4px !important; padding-bottom: 4px !important; }
+}
+
+/* ════ DESKTOP: ONE consistent sub-badge style (OLT TASK, OLT DOCS, BTS INFO) — soft pill rows ════ */
+@media (min-width: 701px) {
+    /* container */
+    body .nav-group-children,
+    body .docs-subnav,
+    body .bts-flyout.open {
+        background: rgba(255, 255, 255, 0.05) !important;
+        border: 1px solid rgba(148, 197, 248, 0.2) !important;
+        border-left: 1px solid rgba(148, 197, 248, 0.2) !important;
+        border-radius: 12px !important;
+        box-shadow: none !important;
+    }
+    body .nav-group-children { padding: 5px !important; gap: 4px !important; }
+    body .docs-subnav { padding: 5px !important; margin-left: 6px !important; }
+    body .bts-flyout.open { padding: 5px !important; margin: 4px 0 2px 6px !important; max-height: 60px; }
+    body .docs-subnav-items { gap: 4px !important; }
+
+    /* rows = soft pills */
+    body .docs-subnav .docs-sub-group-header,
+    body .nav-group-children .nav-child-btn,
+    body .bts-flyout .bts-sub-row {
+        background: rgba(255, 255, 255, 0.07) !important;
+        border: none !important;
+        border-left: none !important;
+        border-radius: 9px !important;
+        color: #e8f3ff !important;
+        box-shadow: none !important;
+        font-weight: 600 !important;
+        transform: none !important;
+        transition: background .18s ease, color .18s ease !important;
+    }
+    body .docs-subnav .docs-sub-group-header { gap: 8px !important; letter-spacing: 1px !important; padding: 0 8px 0 10px !important; }
+    body .bts-flyout .bts-sub-row { height: 32px !important; gap: 8px !important; padding: 0 8px 0 10px !important; justify-content: flex-start !important; }
+    body .docs-subnav .docs-sub-group-header > span,
+    body .nav-group-children .nav-child-name,
+    body .bts-flyout .bts-sub-row > span { color: inherit !important; text-shadow: none !important; }
+    body .bts-flyout .bts-sub-row > span { flex: 1 1 auto; }
+
+    /* small dot before the label */
+    body .docs-subnav .docs-sub-group-header::before,
+    body .bts-flyout .bts-sub-row::before {
+        content: ''; flex: 0 0 6px; width: 6px; height: 6px; border-radius: 50%;
+        background: rgba(125, 211, 252, 0.55); transition: background .18s ease, box-shadow .18s ease;
+    }
+
+    /* arrow in a tiny round chip */
+    body .docs-subnav .docs-sub-group-header::after,
+    body .bts-flyout .bts-sub-row::after {
+        content: '\25B6' !important;
+        flex: 0 0 18px; width: 18px; height: 18px; border-radius: 50%;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 7px !important; padding-left: 1px; box-sizing: border-box;
+        background: rgba(125, 211, 252, 0.14) !important; color: #7dd3fc !important; opacity: 1 !important;
+        transition: background .18s ease, color .18s ease;
+    }
+
+    /* hover */
+    body .docs-subnav .docs-sub-group-header:hover,
+    body .nav-group-children .nav-child-btn:hover,
+    body .bts-flyout .bts-sub-row:hover {
+        background: rgba(125, 211, 252, 0.17) !important;
+        color: #ffffff !important;
+    }
+    body .docs-subnav .docs-sub-group-header:hover::before,
+    body .bts-flyout .bts-sub-row:hover::before { background: #7dd3fc; }
+
+    /* open / active */
+    body .docs-subnav .docs-sub-group-header.open,
+    body .nav-group-children .nav-child-btn.active {
+        background: rgba(56, 189, 248, 0.3) !important;
+        color: #ffffff !important;
+        border: none !important;
+    }
+    body .docs-subnav .docs-sub-group-header.open::before { background: #38bdf8; box-shadow: 0 0 8px #38bdf8; }
+    body .docs-subnav .docs-sub-group-header.open::after { background: #38bdf8 !important; color: #08233f !important; transform: none !important; }
+    body .nav-group-children .nav-child-btn.active::before { display: none !important; }
+}
+
+/* ════ MOBILE: smooth open / close for every sub badge dropdown & flyout ════ */
+@media (max-width: 700px) {
+    .nav-group-children,
+    .docs-subnav,
+    .docs-sub-group-items {
+        opacity: 0;
+        transform: translateY(10px) scale(0.96);
+        transform-origin: bottom left;
+        transition: opacity .24s ease,
+                    transform .28s cubic-bezier(0.22, 0.61, 0.36, 1),
+                    display .28s allow-discrete,
+                    overlay .28s allow-discrete !important;
+        will-change: opacity, transform;
+    }
+    /* Troubleshoot / Installation flyout slides out from the model row (to the right) */
+    .docs-subnav .docs-sub-group-items {
+        transform: translateX(-10px) scale(0.96);
+        transform-origin: left top;
+    }
+
+    /* open state */
+    .nav-group-children.open,
+    .docs-subnav.open,
+    .docs-sub-group-items.open {
+        opacity: 1;
+        transform: none;
+    }
+    /* start values when the element first appears (so opening animates too) */
+    @starting-style {
+        .nav-group-children.open,
+        .docs-subnav.open { opacity: 0; transform: translateY(10px) scale(0.96); }
+        .docs-subnav .docs-sub-group-items.open { opacity: 0; transform: translateX(-10px) scale(0.96); }
+    }
+    /* arrows turn smoothly */
+    .docs-sub-group-header, .nav-child-btn { transition: background .2s ease, color .2s ease !important; }
+}
+/* fallback for browsers without display transitions: animate opening only */
+@supports not (transition-behavior: allow-discrete) {
+    @media (max-width: 700px) {
+        @keyframes subOpenUp { from { opacity: 0; transform: translateY(10px) scale(0.96); } to { opacity: 1; transform: none; } }
+        @keyframes subOpenRight { from { opacity: 0; transform: translateX(-10px) scale(0.96); } to { opacity: 1; transform: none; } }
+        .nav-group-children.open, .docs-subnav.open { animation: subOpenUp .26s cubic-bezier(0.22,0.61,0.36,1); }
+        .docs-subnav .docs-sub-group-items.open { animation: subOpenRight .24s cubic-bezier(0.22,0.61,0.36,1); }
+    }
+}
+@media (max-width: 700px) and (prefers-reduced-motion: reduce) {
+    .nav-group-children, .docs-subnav, .docs-sub-group-items { transition: none !important; animation: none !important; }
 }
 </style>
 
