@@ -11,13 +11,13 @@
 
     <style>
         :root {
-            --sb-bg: linear-gradient(160deg, #050b1e 0%, #0a2557 40%, #1451a3 75%, #1f7fd6 100%);
-            --sb-border: rgba(0,212,255,0.22);
-            --sb-accent: #7dd3fc;
-            --sb-accent2: #00d4ff;
-            --sb-text: #eef8ff;
-            --sb-muted: rgba(125,211,252,0.45);
-            --sb-active-bg: linear-gradient(90deg, rgba(0,212,255,0.16) 0%, rgba(125,211,252,0.16) 100%);
+            --sb-bg: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+            --sb-border: rgba(148, 163, 184, 0.16);
+            --sb-accent: #38bdf8;
+            --sb-accent2: #0284c7;
+            --sb-text: #f8fafc;
+            --sb-muted: #94a3b8;
+            --sb-active-bg: linear-gradient(90deg, rgba(56, 189, 248, 0.14) 0%, rgba(56, 189, 248, 0.03) 100%);
 
             --body-bg: #f0f4ff;
             --body-mesh: radial-gradient(ellipse at 20% 0%, rgba(139,92,246,0.08) 0%, transparent 50%),
@@ -1854,6 +1854,105 @@ font-weight: 700; font-weight: 600; color: #1a3a5c; font-size: 13px; }
         #app-radio #radioBtsTabs.radio-bts-grid { background: linear-gradient(90deg,#00d4ff,#00ff9d) top / 100% 4px no-repeat, #fff; border: 1px solid #e2e8f0; border-radius: 12px; box-shadow: 0 8px 28px rgba(15,23,42,0.12); padding: 22px 16px 16px; margin: 14px auto; width: calc(100% - 28px); max-width: 900px; }
         @media (max-width: 700px) { #app-radio #radioBtsTabs.radio-bts-grid { padding: 18px 10px 10px; margin: 10px auto; width: calc(100% - 16px); } }
         @media (min-width: 701px) { #app-radio .radio-panel-title { text-align: center !important; padding: 0 48px !important; width: 100%; } }
+
+        /* ════ SIDEBAR PROFESSIONAL OVERRIDE (Executive Midnight Slate) ════ */
+        .sidebar {
+            background: var(--sb-bg);
+            border-right: 1px solid var(--sb-border);
+            box-shadow: 4px 0 24px rgba(15, 23, 42, 0.18);
+        }
+        .sidebar::before, .sidebar::after {
+            display: none;
+        }
+        .sidebar-brand {
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        }
+        .brand-title {
+            background: linear-gradient(90deg, #ffffff 0%, #bae6fd 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: none;
+        }
+        .brand-sub {
+            color: #64748b;
+        }
+        .nav-section-label {
+            color: #64748b;
+            font-weight: 700;
+        }
+        .nav-btn-glow {
+            background: #38bdf8;
+            box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
+        }
+        .nav-btn:hover, .nav-group-header:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            border-color: rgba(148, 163, 184, 0.15);
+            box-shadow: none;
+        }
+        .nav-btn.active, .nav-group-header.open {
+            background: var(--sb-active-bg);
+            border-color: rgba(56, 189, 248, 0.3);
+            color: #ffffff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+        }
+        .nav-text .tab-name, .nav-group-header .tab-name {
+            color: #e2e8f0;
+            text-shadow: none;
+            font-weight: 700;
+        }
+        .nav-btn.active .nav-text .tab-name, .nav-group-header.open .tab-name {
+            color: #38bdf8;
+            text-shadow: none;
+        }
+        .nav-text .tab-desc {
+            color: #94a3b8;
+            opacity: 0.85;
+        }
+        .icon-v { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
+        .icon-s { background: rgba(99, 102, 241, 0.15); color: #818cf8; }
+        .icon-g { background: rgba(16, 185, 129, 0.12); color: #34d399; }
+        .icon-r { background: rgba(245, 158, 11, 0.12); color: #fbbf24; }
+        .nav-group-children {
+            background: rgba(15, 23, 42, 0.45);
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-top: none;
+        }
+        .nav-child-btn {
+            color: #94a3b8;
+        }
+        .nav-child-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #f8fafc;
+            border-color: transparent;
+        }
+        .nav-child-btn.active {
+            background: rgba(56, 189, 248, 0.14);
+            color: #38bdf8;
+            border-color: rgba(56, 189, 248, 0.25);
+        }
+        .sidebar-footer {
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+        }
+        .author-name {
+            color: #e2e8f0;
+        }
+        .author-role {
+            color: #94a3b8;
+        }
+        @media (max-width: 700px) {
+            .sidebar {
+                background: #0f172a !important;
+                border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+            }
+            .nav-group-header .tab-name {
+                color: #e2e8f0 !important;
+            }
+            .nav-group-header.open .tab-name {
+                color: #38bdf8 !important;
+            }
+        }
 </style>
 
 <style>
@@ -7476,6 +7575,192 @@ document.addEventListener('mouseover', function (e) {
 }, true);
 </script>
 <script>document.addEventListener('keydown',function(e){if(e.key==='Escape'){var m=document.getElementById('onu-notebook-modal');if(m&&m.classList.contains('open')&&!document.getElementById('nb-rename-input'))closeOnuNotebook();}});</script>
+
+<style>
+/* ════ UNIFIED LIGHTER NAVIGATION BAR THEME ════ */
+:root {
+    --sb-bg: linear-gradient(180deg, #1b324b 0%, #244160 100%) !important;
+    --sb-border: rgba(148, 197, 248, 0.25) !important;
+    --sb-accent: #38bdf8 !important;
+    --sb-text: #f1f5f9 !important;
+    --sb-muted: #cbd5e1 !important;
+    --sb-active-bg: linear-gradient(90deg, rgba(56, 189, 248, 0.24) 0%, rgba(56, 189, 248, 0.08) 100%) !important;
+}
+
+/* Main Sidebar */
+.sidebar {
+    background: var(--sb-bg) !important;
+    border-right: 1px solid var(--sb-border) !important;
+}
+
+.brand-title {
+    background: linear-gradient(90deg, #ffffff 0%, #bae6fd 100%) !important;
+    -webkit-background-clip: text !important;
+    background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
+.brand-sub,
+.nav-section-label,
+.author-role {
+    color: #94b8d8 !important;
+}
+
+.author-name {
+    color: #e2e8f0 !important;
+}
+
+/* Main Nav Buttons & Group Headers */
+.nav-btn,
+.nav-group-header {
+    background: rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(148, 197, 248, 0.14) !important;
+    color: #e2e8f0 !important;
+}
+
+.nav-btn:hover,
+.nav-group-header:hover {
+    background: rgba(56, 189, 248, 0.16) !important;
+    border-color: rgba(56, 189, 248, 0.38) !important;
+    color: #ffffff !important;
+}
+
+.nav-btn.active,
+.nav-group-header.open,
+.nav-btn.bts-open {
+    background: var(--sb-active-bg) !important;
+    border-color: rgba(56, 189, 248, 0.5) !important;
+    color: #ffffff !important;
+}
+
+.nav-text .tab-name,
+.nav-group-header .tab-name {
+    color: #f1f5f9 !important;
+    text-shadow: none !important;
+}
+
+.nav-btn.active .nav-text .tab-name,
+.nav-group-header.open .tab-name,
+.nav-btn.bts-open .tab-name {
+    color: #7dd3fc !important;
+}
+
+.nav-text .tab-desc {
+    color: #cbd5e1 !important;
+    opacity: 0.85 !important;
+}
+
+/* Unified Sub-Menus (OLT TASK, OLT DOCS, BTS INFO) */
+.nav-group-children,
+.docs-subnav,
+.bts-flyout {
+    background: #29496b !important;
+    border: 1px solid rgba(148, 197, 248, 0.28) !important;
+    border-left: 3px solid #38bdf8 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 6px 18px rgba(10, 25, 45, 0.25) !important;
+}
+
+/* Sub-Menu Items */
+.nav-child-btn,
+.docs-sub-group-header,
+.docs-subnav-header,
+.bts-sub-row {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border: 1px solid rgba(186, 230, 253, 0.18) !important;
+    border-left: 3px solid rgba(125, 211, 252, 0.7) !important;
+    color: #f1f5f9 !important;
+    border-radius: 8px !important;
+}
+
+.nav-child-btn:hover,
+.docs-sub-group-header:hover,
+.docs-subnav-header:hover,
+.bts-sub-row:hover {
+    background: rgba(56, 189, 248, 0.22) !important;
+    border-color: rgba(125, 211, 252, 0.5) !important;
+    color: #ffffff !important;
+}
+
+.nav-child-btn.active,
+.docs-sub-group-header.open,
+.docs-subnav-header.open {
+    background: rgba(56, 189, 248, 0.3) !important;
+    border-color: #38bdf8 !important;
+    border-left-color: #38bdf8 !important;
+    color: #ffffff !important;
+}
+
+.nav-child-name,
+.docs-sub-group-header > span {
+    color: #f1f5f9 !important;
+    text-shadow: none !important;
+}
+
+/* Sub-Menu Arrows (Unified Sky Blue instead of mixed green/cyan) */
+.nav-group-arrow,
+.docs-subnav-header .sub-arrow,
+.docs-sub-group-header::after,
+.bts-sub-row::after {
+    color: #7dd3fc !important;
+    opacity: 0.9 !important;
+}
+
+/* Desktop Flyout (Troubleshoot / Installation) */
+@media (min-width: 701px) {
+    .docs-subnav .docs-sub-group-items.open {
+        background: #29496b !important;
+        border: 1px solid rgba(125, 211, 252, 0.45) !important;
+        box-shadow: 0 10px 26px rgba(10, 25, 45, 0.35) !important;
+    }
+    .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf {
+        color: #e2e8f0 !important;
+        text-shadow: none !important;
+    }
+    .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf::before {
+        background: #7dd3fc !important;
+        box-shadow: none !important;
+    }
+    .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf:hover,
+    .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf.active {
+        background: rgba(56, 189, 248, 0.25) !important;
+        color: #ffffff !important;
+    }
+}
+
+/* Mobile View Unified Light Theme */
+@media (max-width: 700px) {
+    .sidebar {
+        background: #1b324b !important;
+        border-top: 1px solid rgba(148, 197, 248, 0.28) !important;
+    }
+    .nav-group-children,
+    .docs-subnav,
+    .bts-flyout {
+        background: #29496b !important;
+        border: 1px solid rgba(148, 197, 248, 0.35) !important;
+    }
+    .nav-child-btn,
+    .docs-sub-group-header,
+    .docs-subnav-header,
+    .bts-sub-row,
+    .docs-sub-btn-leaf {
+        color: #f1f5f9 !important;
+        border-bottom-color: rgba(148, 197, 248, 0.18) !important;
+    }
+    .nav-child-name {
+        color: #f1f5f9 !important;
+    }
+    .nav-child-btn.active,
+    .docs-sub-group-header.open,
+    .docs-sub-btn-leaf.active,
+    .bts-sub-row:active {
+        background: rgba(56, 189, 248, 0.28) !important;
+        color: #7dd3fc !important;
+    }
+}
+</style>
+
 </body>
 </html>
 </div>
