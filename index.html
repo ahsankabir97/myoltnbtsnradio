@@ -8335,6 +8335,9 @@ document.addEventListener('mouseover', function (e) {
     #d_olt_ips #olt-bts-detail.olt-sheet .olt-back-btn .material-icons { font-size: 15px !important; }
     #d_olt_ips #olt-bts-detail.olt-sheet .olt-detail-title { font-size: 0.88rem !important; }
     #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table th { white-space: nowrap !important; padding: var(--t-pad, 5px) var(--t-px, 6px) !important; font-size: calc(var(--t-fs, 0.76rem) - 0.08rem) !important; }
+    /* column separators + navy Eth port */
+    #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table th + th, #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table td + td { border-left: 1px solid #cbd5e1 !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table td .olt-port { color: #0b2a6f !important; font-weight: 700; }
     #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table td .olt-port { display: block; margin-top: 1px; line-height: 1.15; }
     #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table td { white-space: nowrap !important; padding: var(--t-pad, 5px) var(--t-px, 6px) !important; font-size: var(--t-fs, 0.76rem) !important; line-height: 1.2 !important; }
     /* selected BTS: same look as the existing hover state (no new colours) */
