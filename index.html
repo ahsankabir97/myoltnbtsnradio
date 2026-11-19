@@ -8391,7 +8391,7 @@ document.addEventListener('mouseover', function (e) {
         // only the table text may adapt (to avoid sideways scrolling); it never goes below a readable size
         var STEPS = [
             { fs: .9,  pad: 8,   px: 8 }, { fs: .86, pad: 7,   px: 7 }, { fs: .82, pad: 6.5, px: 6 },
-            { fs: .78, pad: 6,   px: 5 }, { fs: .74, pad: 5.5, px: 4 }, { fs: .7,  pad: 5,   px: 3 }
+            { fs: .78, pad: 6,   px: 5 }, { fs: .74, pad: 5,   px: 4 }, { fs: .7,  pad: 4,   px: 3 }
         ];
         function setTbl(t) { pg.style.setProperty('--t-fs', t.fs + 'rem'); pg.style.setProperty('--t-pad', t.pad + 'px'); pg.style.setProperty('--t-px', t.px + 'px'); }
         var pick = null, i;
@@ -8399,9 +8399,8 @@ document.addEventListener('mouseover', function (e) {
             setTbl(STEPS[i]);
             if (s.scrollWidth <= s.clientWidth + 1 && s.scrollHeight <= s.clientHeight + 1) { pick = i; break; }
         }
-        if (pick === null) {                                 // 2nd choice: fits width (height scrolls)
-            for (i = 0; i < STEPS.length; i++) {
-                if (STEPS[i].fs < .78 && i > 0) { /* keep readable */ }
+        if (pick === null) {                                 // 2nd choice: smallest readable table text that still fits the width (rest scrolls inside the sheet)
+            for (i = STEPS.length - 1; i >= 0; i--) {
                 setTbl(STEPS[i]);
                 if (s.scrollWidth <= s.clientWidth + 1) { pick = i; break; }
             }
