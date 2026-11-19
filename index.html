@@ -8363,7 +8363,10 @@ document.addEventListener('mouseover', function (e) {
         { pad: '8px 10px', name: '.85rem', count: '.68rem', gap: '7px' },
         { pad: '6px 9px',  name: '.8rem',  count: '.64rem', gap: '6px' },
         { pad: '5px 9px',  name: '.76rem', count: '.62rem', gap: '5px' },
-        { pad: '4px 9px',  name: '.72rem', count: '.6rem',  gap: '5px' }
+        { pad: '4px 9px',  name: '.72rem', count: '.6rem',  gap: '5px' },
+        { pad: '11px 12px', name: '1rem',    count: '.8rem',  gap: '10px' },
+        { pad: '10px 11px', name: '.95rem',  count: '.76rem', gap: '9px' },
+        { pad: '9px 10px',  name: '.9rem',   count: '.72rem', gap: '8px' }
     ];
     function applyLevel(pg, lv) {
         var L = LEVELS[lv];
@@ -8383,6 +8386,11 @@ document.addEventListener('mouseover', function (e) {
         var sc = document.getElementById('docs-content-scroll'); if (sc) sc.scrollTop = 0;
         // balanced steps: box size and table font shrink together (table font is capped, boxes never get tiny)
         var STEPS = [
+            { lv: 5, t: {fs:1,   pad:10,  px:6} },
+            { lv: 5, t: {fs:.96, pad:9,   px:6} },
+            { lv: 6, t: {fs:.94, pad:8.5, px:6} },
+            { lv: 6, t: {fs:.92, pad:8,   px:6} },
+            { lv: 7, t: {fs:.9,  pad:7.5, px:6} },
             { lv: 0, t: {fs:.88, pad:7,   px:6} },
             { lv: 1, t: {fs:.86, pad:7,   px:6} },
             { lv: 2, t: {fs:.84, pad:6.5, px:6} },
@@ -8402,11 +8410,19 @@ document.addEventListener('mouseover', function (e) {
             applyLevel(pg, STEPS[si].lv); setTbl(STEPS[si].t, 0);
             fits = gapPx() >= 0 && s.scrollWidth <= s.clientWidth + 1;
         }
-        if (fits) {                                   // spend a little leftover space on roomier rows (capped)
+        if (fits) {                                   // spend the leftover space: roomier boxes + roomier table rows (no big empty gap)
             var rows = 1; Array.prototype.forEach.call(document.querySelectorAll('#docs-olt-ip-tbody tr'), function (r) { if (r.style.display !== 'none') rows++; });
-            var st = STEPS[si - 1], extra = Math.max(0, Math.min(3, Math.floor(gapPx() / (rows * 2) * 2) / 2));
-            setTbl(st.t, extra);
-            if (gapPx() < 0) setTbl(st.t, 0);
+            var st = STEPS[si - 1], L = LEVELS[st.lv], g = gapPx();
+            var nb = document.querySelectorAll('#olt-bts-buttons .olt-bts-btn').length, brows = Math.max(1, Math.ceil(nb / 2));
+            var bx = Math.max(0, Math.min(5, Math.floor(g * 0.4 / (brows * 2) * 2) / 2));
+            var tx = Math.max(0, Math.min(9, Math.floor(g * 0.6 / (rows * 2) * 2) / 2));
+            function withExtra(bx, tx) {
+                if (L) { var pp = L.pad.split(' '); pg.style.setProperty('--f-pad', (parseFloat(pp[0]) + bx) + 'px ' + pp[1]); }
+                setTbl(st.t, tx);
+            }
+            withExtra(bx, tx);
+            if (gapPx() < 0) withExtra(Math.max(0, bx - 2), Math.max(0, tx - 2));
+            if (gapPx() < 0) withExtra(0, 0);
         } else { applyLevel(pg, 4); setTbl(STEPS[STEPS.length - 1].t, 0); }
         if (!fits) list.style.marginBottom = (s.offsetHeight + 12) + 'px';   // still too tall: list can scroll clear of the sheet
         var post = snap(pg);
