@@ -7650,6 +7650,8 @@ document.addEventListener('mouseover', function (e) {
     opacity: 0.85 !important;
 }
 
+/* Unified Sub-Menus — DESKTOP only (mobile keeps the light dropdown style) */
+@media (min-width: 701px) {
 /* Unified Sub-Menus (OLT TASK, OLT DOCS, BTS INFO) */
 .nav-group-children,
 .docs-subnav,
@@ -7706,6 +7708,8 @@ document.addEventListener('mouseover', function (e) {
     opacity: 0.9 !important;
 }
 
+}
+
 /* Desktop Flyout (Troubleshoot / Installation) */
 @media (min-width: 701px) {
     .docs-subnav .docs-sub-group-items.open {
@@ -7728,35 +7732,11 @@ document.addEventListener('mouseover', function (e) {
     }
 }
 
-/* Mobile View Unified Light Theme */
+/* Mobile: sub menus use the light dropdown style (OLT DOCS / OLT TASK) */
 @media (max-width: 700px) {
     .sidebar {
         background: #1b324b !important;
         border-top: 1px solid rgba(148, 197, 248, 0.28) !important;
-    }
-    .nav-group-children,
-    .docs-subnav,
-    .bts-flyout {
-        background: #29496b !important;
-        border: 1px solid rgba(148, 197, 248, 0.35) !important;
-    }
-    .nav-child-btn,
-    .docs-sub-group-header,
-    .docs-subnav-header,
-    .bts-sub-row,
-    .docs-sub-btn-leaf {
-        color: #f1f5f9 !important;
-        border-bottom-color: rgba(148, 197, 248, 0.18) !important;
-    }
-    .nav-child-name {
-        color: #f1f5f9 !important;
-    }
-    .nav-child-btn.active,
-    .docs-sub-group-header.open,
-    .docs-sub-btn-leaf.active,
-    .bts-sub-row:active {
-        background: rgba(56, 189, 248, 0.28) !important;
-        color: #7dd3fc !important;
     }
 }
 </style>
