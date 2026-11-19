@@ -8200,6 +8200,309 @@ document.addEventListener('mouseover', function (e) {
 #onu-script-view-modal .onu-view-actions .btn.btn-cpy, #lp-script-view-modal .onu-view-actions .btn.btn-cpy { background: linear-gradient(135deg,#0e7490,#06b6d4) !important; color: #ffffff !important; }
 #onu-script-view-modal textarea.onu-view-textarea, #lp-script-view-modal textarea.onu-view-textarea { background: rgba(4,40,56,0.35) !important; border-color: rgba(255,255,255,0.25) !important; color: #ecfeff !important; }
 </style>
+<style>
+/* ════ TEXT-ONLY HIGHLIGHT: badge fill never changes on hover / active / open — only the text lights up ════ */
+.nav-btn.active::after { display: none !important; animation: none !important; }
+.nav-btn .nav-btn-glow, .nav-btn.active .nav-btn-glow { opacity: 0 !important; }
+
+@media (min-width: 701px) {
+    /* main badges: same fill + shadow in every state */
+    html body .sidebar .nav-btn:hover, html body .sidebar .nav-group-header:hover,
+    html body .sidebar .nav-btn.active, html body .sidebar .nav-group-header.open, html body .sidebar .nav-btn.bts-open {
+        background: linear-gradient(135deg, rgba(14,116,144,0.62) 0%, rgba(8,145,178,0.42) 100%) !important;
+        box-shadow: 0 6px 14px rgba(3,45,62,0.35), 0 1px 3px rgba(3,45,62,0.3), inset 0 1px 0 rgba(255,255,255,0.24), inset 0 -2px 5px rgba(3,45,62,0.22) !important;
+    }
+    /* sub badges (OLT TASK children, OLT DOCS GPON/EPON + model rows): same fill in every state */
+    html body .nav-group-children .nav-child-btn:hover, html body .nav-group-children .nav-child-btn.active,
+    html body .docs-subnav .docs-sub-group-header:hover, html body .docs-subnav .docs-sub-group-header.open,
+    html body .docs-subnav .docs-subnav-header:hover, html body .docs-subnav .docs-subnav-header.open,
+    html body .bts-flyout .bts-sub-row:hover {
+        background: linear-gradient(135deg, rgba(14,116,144,0.7) 0%, rgba(8,145,178,0.5) 100%) !important;
+        box-shadow: 0 3px 8px rgba(3,45,62,0.35), inset 0 1px 0 rgba(255,255,255,0.22) !important;
+    }
+    html body .docs-subnav .docs-sub-group-header.open::after { background: rgba(255,255,255,0.22) !important; color: #ffffff !important; }
+    html body .docs-subnav .docs-sub-group-header.open::before { background: rgba(255,255,255,0.7) !important; box-shadow: none !important; }
+    /* Troubleshoot / Installation leaves */
+    html body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf:hover,
+    html body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf.active {
+        background: rgba(255,255,255,0.1) !important;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.16) !important;
+    }
+    html body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf.active::before,
+    html body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf:hover::before { background: rgba(255,255,255,0.75) !important; box-shadow: none !important; }
+
+    /* the text itself is what gets highlighted */
+    html body .sidebar .nav-btn:hover .tab-name, html body .sidebar .nav-group-header:hover .tab-name,
+    html body .sidebar .nav-btn.active .tab-name, html body .sidebar .nav-group-header.open .tab-name, html body .sidebar .nav-btn.bts-open .tab-name,
+    html body .nav-group-children .nav-child-btn:hover .nav-child-name, html body .nav-group-children .nav-child-btn.active .nav-child-name,
+    html body .docs-subnav .docs-sub-group-header:hover > span:first-child, html body .docs-subnav .docs-sub-group-header.open > span:first-child,
+    html body .docs-subnav .docs-subnav-header:hover > span:first-child, html body .docs-subnav .docs-subnav-header.open > span:first-child,
+    html body .bts-flyout .bts-sub-row:hover > span,
+    html body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf:hover,
+    html body .docs-subnav .docs-sub-group-items.open .docs-sub-btn-leaf.active {
+        color: #ffffff !important;
+        text-shadow: 0 0 9px rgba(255,255,255,0.95), 0 0 2px rgba(255,255,255,0.8) !important;
+    }
+    html body .sidebar .nav-btn:hover .tab-desc, html body .sidebar .nav-group-header:hover .tab-desc,
+    html body .sidebar .nav-btn.active .tab-desc, html body .sidebar .nav-group-header.open .tab-desc, html body .sidebar .nav-btn.bts-open .tab-desc {
+        color: rgba(255,255,255,0.85) !important; text-shadow: 0 0 7px rgba(255,255,255,0.6) !important;
+    }
+}
+@media (max-width: 700px) {
+    html body .sidebar .nav-btn.active, html body .sidebar .nav-group-header.open { background: rgba(255,255,255,0.04) !important; box-shadow: none !important; }
+    html body .sidebar .nav-btn.active .tab-name, html body .sidebar .nav-group-header.open .tab-name {
+        color: #ffffff !important; text-shadow: 0 0 9px rgba(255,255,255,0.95) !important;
+    }
+}
+</style>
+<script>
+/* ════ OLT DOCS sub badges (model rows / Troubleshoot-Installation flyout) always start closed when you come back ════ */
+(function () {
+    function resetDocsSubnavState() {
+        document.querySelectorAll('#docs-subnav .docs-subnav-items, #docs-subnav .docs-subnav-header, #docs-subnav .docs-sub-group-items, #docs-subnav .docs-sub-group-header')
+            .forEach(function (el) { el.classList.remove('open'); });
+    }
+    window.resetDocsSubnavState = resetDocsSubnavState;
+    function wrap(name, shouldReset) {
+        var orig = window[name];
+        if (typeof orig !== 'function') return;
+        window[name] = function () {
+            if (!shouldReset || shouldReset()) resetDocsSubnavState();
+            return orig.apply(this, arguments);
+        };
+    }
+    wrap('switchTab');            // OLT TASK children, BTS INFO
+    wrap('switchToRadioTab');     // RADIO
+    wrap('switchToDocsTab', function () { return !document.body.classList.contains('docs-mode'); });  // arriving from another tab
+    wrap('toggleDocsGroup', function () {                                                              // re-opening the OLT DOCS menu
+        var sn = document.getElementById('docs-subnav');
+        return !(sn && sn.classList.contains('open'));
+    });
+})();
+</script>
+<script>
+/* ════ MOBILE: BTS INFO — single tap = BTS list only, double tap = show "HUAWEI COMMANDS" sub badge ════ */
+(function () {
+    var orig = window.btsNavClick;
+    if (typeof orig !== 'function') return;
+    var last = 0, GAP = 380;
+    var nb = document.getElementById('nav-bts');
+    if (nb) nb.style.touchAction = 'manipulation';
+    window.btsNavClick = function (btn) {
+        if (window.innerWidth > 700) return orig.apply(this, arguments);     // desktop unchanged
+        var now = Date.now();
+        if (now - last < GAP) {                                               // 2nd tap -> sub badge
+            last = 0;
+            var app = document.getElementById('app-bts');
+            if (!app || !app.classList.contains('active')) { switchTab('app-bts', btn); btsShowList(); }
+            btsFlyoutOpen();
+        } else {                                                              // 1st tap -> default page, no sub badge
+            last = now;
+            btsFlyoutClose();
+            var a = document.getElementById('app-bts');
+            if (!a || !a.classList.contains('active')) switchTab('app-bts', btn);
+            btsShowList();
+        }
+    };
+})();
+</script>
+<style>
+/* ════ MOBILE · OLT IP Info: BTS list stays on screen, OLT table slides up from the bottom (no scrollbar, boxes auto-fit) ════ */
+@media (max-width: 700px) {
+    #d_olt_ips #olt-bts-detail.olt-sheet {
+        position: fixed; left: 8px; right: 8px; z-index: 60;
+        max-height: calc(100vh - 150px); overflow-y: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain;
+        background: #ffffff; border-radius: 16px 16px 0 0; padding: 4px 8px 6px;
+        border: 1px solid #cbd5e1; border-bottom: none;
+        box-shadow: 0 -8px 26px rgba(3, 45, 62, 0.28);
+        animation: oltSheetUp .55s cubic-bezier(0.16, 1, 0.3, 1) both; will-change: transform, opacity;
+    }
+    #d_olt_ips #olt-bts-detail.olt-sheet.olt-closing { animation: oltSheetDown .3s cubic-bezier(0.5, 0, 0.75, 0) both !important; pointer-events: none; }
+    /* table rows glide in one after another */
+    #d_olt_ips #olt-bts-detail.olt-sheet tbody tr { animation: oltRowIn .5s cubic-bezier(0.22, 0.9, 0.3, 1) both; animation-delay: calc(var(--ri, 0) * 55ms + 160ms); }
+    #d_olt_ips #olt-bts-detail.olt-sheet.olt-closing tbody tr { animation: none; }
+    /* BTS boxes shrink / grow smoothly instead of snapping (transitions are switched off only while the fit script measures) */
+    #d_olt_ips .olt-bts-grid { transition: gap .45s cubic-bezier(0.22, 0.9, 0.3, 1); }
+    #d_olt_ips .olt-bts-btn { transition: padding .45s cubic-bezier(0.22, 0.9, 0.3, 1), border-color .3s ease, box-shadow .3s ease, transform .2s ease, filter .2s ease !important; }
+    #d_olt_ips .olt-bts-btn .obb-name, #d_olt_ips .olt-bts-btn .obb-count { transition: font-size .45s cubic-bezier(0.22, 0.9, 0.3, 1); }
+    #d_olt_ips.olt-measure, #d_olt_ips.olt-measure * { transition: none !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet::-webkit-scrollbar { display: none; width: 0; height: 0; }
+    #d_olt_ips #olt-bts-detail.olt-sheet.olt-swap { animation: oltSheetSwap .3s ease both; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .olt-detail-head { display: none !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet { padding-top: 2px !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .olt-detail-head--old { position: sticky; top: 0; background: #ffffff; padding: 2px 0 5px; margin: 0 0 3px; gap: 8px; z-index: 2; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .olt-back-btn { padding: 3px 10px !important; font-size: 0.72rem !important; border-radius: 8px !important; min-height: 0 !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .olt-back-btn .material-icons { font-size: 15px !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .olt-detail-title { font-size: 0.88rem !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table th { white-space: nowrap !important; padding: var(--t-pad, 5px) var(--t-px, 6px) !important; font-size: calc(var(--t-fs, 0.76rem) - 0.08rem) !important; }
+    #d_olt_ips #olt-bts-detail.olt-sheet .docs-olt-table td { white-space: nowrap !important; padding: var(--t-pad, 5px) var(--t-px, 6px) !important; font-size: var(--t-fs, 0.76rem) !important; line-height: 1.2 !important; }
+    /* selected BTS: same look as the existing hover state (no new colours) */
+    #d_olt_ips .olt-bts-btn.olt-sel { border-color: #67e8f9 !important; box-shadow: 0 6px 18px rgba(8, 145, 178, 0.45) !important; }
+    /* BTS boxes auto-fit: size comes from vars set by the fit script (normal size when everything already fits) */
+    #d_olt_ips.olt-sheet-open .docs-card-header { margin-bottom: 4px !important; padding-bottom: 4px !important; }
+    #d_olt_ips.olt-sheet-open .olt-bts-grid { gap: var(--f-gap, 8px) !important; margin-top: 0 !important; }
+    #d_olt_ips.olt-sheet-open .olt-bts-btn { padding: var(--f-pad, 8px 10px) !important; gap: 0 !important; border-radius: 9px !important; min-height: 0 !important; }
+    #d_olt_ips.olt-sheet-open .olt-bts-btn .material-icons { display: none !important; }
+    #d_olt_ips.olt-sheet-open .olt-bts-btn .obb-name { white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+    #d_olt_ips.olt-sheet-open .olt-bts-btn .obb-name { font-size: var(--f-name, 0.85rem) !important; line-height: 1.15 !important; }
+    #d_olt_ips.olt-sheet-open .olt-bts-btn .obb-count { font-size: var(--f-count, 0.68rem) !important; line-height: 1.1 !important; }
+}
+@keyframes oltSheetUp { from { transform: translateY(105%); opacity: .85; } to { transform: translateY(0); opacity: 1; } }
+@keyframes oltSheetDown { from { transform: translateY(0); opacity: 1; } to { transform: translateY(105%); opacity: .85; } }
+@keyframes oltSheetSwap { from { opacity: .55; } to { opacity: 1; } }
+@keyframes oltRowIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+</style>
+<script>
+(function () {
+    var origShow = window.showOltBts, origBack = window.backToOltBtsList;
+    if (typeof origShow !== 'function' || typeof origBack !== 'function') return;
+    function mobile() { return window.innerWidth <= 700; }
+    function sheet() { return document.getElementById('olt-bts-detail'); }
+    var LEVELS = [   // 0 = normal size, then progressively smaller until the BTS list + table fit on one screen
+        null,
+        { pad: '8px 10px', name: '.85rem', count: '.68rem', gap: '7px' },
+        { pad: '6px 9px',  name: '.8rem',  count: '.64rem', gap: '6px' },
+        { pad: '5px 9px',  name: '.76rem', count: '.62rem', gap: '5px' },
+        { pad: '4px 9px',  name: '.72rem', count: '.6rem',  gap: '5px' }
+    ];
+    function applyLevel(pg, lv) {
+        var L = LEVELS[lv];
+        pg.classList.toggle('olt-sheet-open', !!L);
+        ['--f-pad', '--f-name', '--f-count', '--f-gap'].forEach(function (v) { pg.style.removeProperty(v); });
+        if (L) { pg.style.setProperty('--f-pad', L.pad); pg.style.setProperty('--f-name', L.name); pg.style.setProperty('--f-count', L.count); pg.style.setProperty('--f-gap', L.gap); }
+    }
+    var FV = ['--f-pad', '--f-name', '--f-count', '--f-gap'];
+    function snap(pg) { return { open: pg.classList.contains('olt-sheet-open'), v: FV.map(function (n) { return pg.style.getPropertyValue(n); }) }; }
+    function restore(pg, st) { pg.classList.toggle('olt-sheet-open', st.open); FV.forEach(function (n, i) { if (st.v[i]) pg.style.setProperty(n, st.v[i]); else pg.style.removeProperty(n); }); }
+    function place() {
+        var s = sheet(), bar = document.querySelector('.sidebar'), pg = document.getElementById('d_olt_ips'), list = document.getElementById('olt-bts-buttons');
+        if (!s || !s.classList.contains('olt-sheet') || !bar || !pg || !list) return;
+        s.style.bottom = Math.max(0, window.innerHeight - bar.getBoundingClientRect().top) + 'px';
+        list.style.marginBottom = '';
+        var pre = snap(pg); pg.classList.add('olt-measure');   // measure without transitions, then animate pre -> final
+        var sc = document.getElementById('docs-content-scroll'); if (sc) sc.scrollTop = 0;
+        // balanced steps: box size and table font shrink together (table font is capped, boxes never get tiny)
+        var STEPS = [
+            { lv: 0, t: {fs:.88, pad:7,   px:6} },
+            { lv: 1, t: {fs:.86, pad:7,   px:6} },
+            { lv: 2, t: {fs:.84, pad:6.5, px:6} },
+            { lv: 3, t: {fs:.82, pad:6,   px:6} },
+            { lv: 3, t: {fs:.80, pad:6,   px:6} },
+            { lv: 4, t: {fs:.78, pad:5.5, px:6} },
+            { lv: 4, t: {fs:.75, pad:5,   px:5} },
+            { lv: 4, t: {fs:.72, pad:5,   px:5} },
+            { lv: 4, t: {fs:.69, pad:4.5, px:4} },
+            { lv: 4, t: {fs:.66, pad:4,   px:3} },
+            { lv: 4, t: {fs:.62, pad:4,   px:2} }
+        ];
+        function setTbl(t, extra) { pg.style.setProperty('--t-fs', t.fs + 'rem'); pg.style.setProperty('--t-pad', (t.pad + extra) + 'px'); pg.style.setProperty('--t-px', t.px + 'px'); }
+        function gapPx() { return (bar.getBoundingClientRect().top - s.offsetHeight) - list.getBoundingClientRect().bottom - 8; }
+        var fits = false, si;
+        for (si = 0; si < STEPS.length && !fits; si++) {
+            applyLevel(pg, STEPS[si].lv); setTbl(STEPS[si].t, 0);
+            fits = gapPx() >= 0 && s.scrollWidth <= s.clientWidth + 1;
+        }
+        if (fits) {                                   // spend a little leftover space on roomier rows (capped)
+            var rows = 1; Array.prototype.forEach.call(document.querySelectorAll('#docs-olt-ip-tbody tr'), function (r) { if (r.style.display !== 'none') rows++; });
+            var st = STEPS[si - 1], extra = Math.max(0, Math.min(3, Math.floor(gapPx() / (rows * 2) * 2) / 2));
+            setTbl(st.t, extra);
+            if (gapPx() < 0) setTbl(st.t, 0);
+        } else { applyLevel(pg, 4); setTbl(STEPS[STEPS.length - 1].t, 0); }
+        if (!fits) list.style.marginBottom = (s.offsetHeight + 12) + 'px';   // still too tall: list can scroll clear of the sheet
+        var post = snap(pg);
+        restore(pg, pre); void pg.offsetWidth;          // back to the starting look (no transition running)
+        pg.classList.remove('olt-measure'); void pg.offsetWidth;
+        restore(pg, post);                              // now the BTS boxes glide to the fitted size
+    }
+    function mark(name) {
+        document.querySelectorAll('#olt-bts-buttons .olt-bts-btn').forEach(function (b) {
+            b.classList.toggle('olt-sel', b.getAttribute('data-bts') === name);
+        });
+    }
+    function clearSheet() {
+        var pg = document.getElementById('d_olt_ips'); if (pg) { applyLevel(pg, 0); pg.style.removeProperty('--t-fs'); pg.style.removeProperty('--t-pad'); pg.style.removeProperty('--t-px'); }
+        var s = sheet(), list = document.getElementById('olt-bts-buttons');
+        if (s) { s.classList.remove('olt-sheet', 'olt-swap', 'olt-closing'); s.style.bottom = ''; }
+        if (list) list.style.marginBottom = '';
+        mark(null);
+    }
+    var closing = null;
+    function finishClose() { if (!closing) return; clearTimeout(closing.t); var f = closing.fn; closing = null; f(); }
+    window.showOltBts = function (name) {
+        finishClose();
+        if (!mobile()) { clearSheet(); return origShow.apply(this, arguments); }
+        var s = sheet(), wasOpen = s && s.classList.contains('olt-sheet') && s.style.display !== 'none';
+        if (wasOpen && typeof currentOltBts !== 'undefined' && currentOltBts === name && !(typeof oltToolMode !== 'undefined' && oltToolMode)) { window.backToOltBtsList(); return; }   // tap the selected BTS again = close
+        origShow.apply(this, arguments);
+        if (typeof currentOltBts === 'undefined' || currentOltBts !== name) return;   // edit / delete mode handled by the original
+        var list = document.getElementById('olt-bts-buttons');
+        if (list) list.style.display = '';                 // BTS list stays visible
+        s.classList.add('olt-sheet');
+        if (wasOpen) { s.classList.remove('olt-swap'); void s.offsetWidth; s.classList.add('olt-swap'); }   // another BTS: swap content
+        else s.classList.remove('olt-swap');
+        var ri = 0; Array.prototype.forEach.call(document.querySelectorAll('#docs-olt-ip-tbody tr'), function (r) { if (r.style.display !== 'none') r.style.setProperty('--ri', ri++); });
+        mark(name);
+        place();
+        s.scrollTop = 0;
+    };
+    window.backToOltBtsList = function () {
+        finishClose();
+        var self = this, args = arguments, s = sheet(), pg = document.getElementById('d_olt_ips');
+        if (!mobile() || !s || !pg || !s.classList.contains('olt-sheet') || s.style.display === 'none') { clearSheet(); return origBack.apply(self, args); }
+        applyLevel(pg, 0); mark(null);                  // BTS boxes grow back while the sheet slides down
+        s.classList.remove('olt-swap'); s.classList.add('olt-closing');
+        closing = { fn: function () { clearSheet(); origBack.apply(self, args); }, t: setTimeout(finishClose, 300) };
+    };
+    window.addEventListener('resize', function () { if (!mobile()) clearSheet(); else place(); });
+    window.addEventListener('orientationchange', function () { setTimeout(place, 250); });
+})();
+</script>
+<style>
+/* ════ BTS INFO: smooth open / close of a BTS (list <-> details) ════ */
+#bts-buttons.bts-out, #bts-detail.bts-out { opacity: 0 !important; transform: translateY(-8px) scale(0.985) !important; pointer-events: none; transition: opacity .2s ease, transform .2s ease; }
+#bts-detail.bts-in { animation: btsDetailIn .38s cubic-bezier(0.22, 0.9, 0.3, 1) both; }
+#bts-buttons.bts-in { animation: btsListIn .34s ease both; }
+@keyframes btsDetailIn { from { opacity: 0; transform: translateY(18px) scale(0.985); } to { opacity: 1; transform: none; } }
+@keyframes btsListIn { from { opacity: 0; } to { opacity: 1; } }
+#bts-detail { will-change: opacity, transform; }
+</style>
+<script>
+(function () {
+    var origOpen = window.showBtsDetail, origBack = window.backToBtsList;
+    if (typeof origOpen !== 'function' || typeof origBack !== 'function') return;
+    var busy = false, OUT_MS = 200;
+    function playIn(el) {
+        if (!el) return;
+        el.classList.remove('bts-in'); void el.offsetWidth; el.classList.add('bts-in');
+        setTimeout(function () { el.classList.remove('bts-in'); }, 450);
+    }
+    function swap(outEl, action, inId) {
+        if (busy || !outEl) { action(); return; }
+        busy = true;
+        outEl.classList.add('bts-out');
+        setTimeout(function () {
+            outEl.classList.remove('bts-out');
+            action();
+            playIn(document.getElementById(inId));
+            busy = false;
+        }, OUT_MS);
+    }
+    // open: list fades away, details slide/fade in (edit / delete mode keeps the original instant behaviour)
+    window.showBtsDetail = function (name) {
+        var inMode = (typeof btsToolMode !== 'undefined' && btsToolMode);
+        var already = (typeof btsOpen !== 'undefined' && btsOpen);
+        if (inMode || already) return origOpen.apply(this, arguments);
+        swap(document.getElementById('bts-buttons'), function () { origOpen(name); }, 'bts-detail');
+    };
+    // close (Back button only — tab switches still reset instantly)
+    window.btsBackAnimated = function () {
+        if (!(typeof btsOpen !== 'undefined' && btsOpen)) return origBack();
+        swap(document.getElementById('bts-detail'), function () { origBack(); }, 'bts-buttons');
+    };
+    var back = document.querySelector('#bts-detail .olt-back-btn');
+    if (back) back.setAttribute('onclick', 'btsBackAnimated()');
+})();
+</script>
 </body>
 </html>
 </div>
