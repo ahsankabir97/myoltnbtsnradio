@@ -9258,6 +9258,45 @@ body.radio-mode .main-content {
     #app-radio .radio-detail-back .material-icons,
     #app-radio #radioBackBar .olt-back-btn .material-icons { font-size: 20px !important; }
 }
+
+/* ════ MOBILE ONLY: OLT IP INFO / Radio bottom sheet — slow, silky slide-up (web view unchanged) ════ */
+@keyframes sheetCardIn { 0% { opacity: 0; transform: translate3d(0, 30px, 0); } 100% { opacity: 1; transform: none; } }
+@media (max-width: 700px) {
+    /* backdrop: plain fade (blur re-paints every frame on phones) */
+    #radioSheetBackdrop, #oltIpSheetBackdrop {
+        -webkit-backdrop-filter: none; backdrop-filter: none;
+        transition: opacity .7s ease;
+    }
+    /* sheet: long travel + balanced easing (expo-out finished 90% of the move in the first 150ms -> felt "instant") */
+    #radioSheet, #olt-bts-detail.ois-panel {
+        transition: transform .9s cubic-bezier(.33, .85, .4, 1), opacity .5s ease, visibility 0s linear .9s;
+    }
+    #radioSheet.open, #olt-bts-detail.ois-panel.ois-open {
+        transition: transform .9s cubic-bezier(.33, .85, .4, 1), opacity .45s ease, visibility 0s;
+    }
+    /* rows glide up one after another AFTER the sheet is mostly in place */
+    #olt-bts-detail.ois-open .docs-olt-table tbody tr,
+    #radioSheet.open .rs-body > * { animation: sheetCardIn .85s cubic-bezier(.22, 1, .36, 1) backwards; }
+    html #radioSheet.open .rs-body > :nth-child(1) { animation-delay: 300ms; }
+    html #radioSheet.open .rs-body > :nth-child(2) { animation-delay: 380ms; }
+    html #radioSheet.open .rs-body > :nth-child(3) { animation-delay: 460ms; }
+    html #radioSheet.open .rs-body > :nth-child(4) { animation-delay: 540ms; }
+    html #radioSheet.open .rs-body > :nth-child(5) { animation-delay: 620ms; }
+    html #radioSheet.open .rs-body > :nth-child(6) { animation-delay: 700ms; }
+    html #radioSheet.open .rs-body > :nth-child(7) { animation-delay: 780ms; }
+    html #radioSheet.open .rs-body > :nth-child(8) { animation-delay: 860ms; }
+    html #radioSheet.open .rs-body > :nth-child(9) { animation-delay: 940ms; }
+    html #radioSheet.open .rs-body > :nth-child(10) { animation-delay: 1020ms; }
+    html #radioSheet.open .rs-body > :nth-child(11) { animation-delay: 1100ms; }
+    html #radioSheet.open .rs-body > :nth-child(12) { animation-delay: 1180ms; }
+    /* back button pops in last */
+    #radioSheet.open .ois-fab, #olt-bts-detail.ois-open .ois-fab { animation: fabIn .6s .65s cubic-bezier(.22, 1, .36, 1) backwards; }
+}
+
+/* OLT IP INFO rows: delay = position among VISIBLE rows (hidden rows of other BTS no longer push the first row back) */
+@media (max-width: 700px) {
+    html #olt-bts-detail.ois-panel.ois-open .ois-body .docs-olt-table tbody tr { animation-delay: calc(min(var(--vi, 0), 8) * 70ms + 200ms); }
+}
 </style>
 
 <script>
@@ -9321,6 +9360,22 @@ body.radio-mode .main-content {
             app.classList.add('radio-returning');
             setTimeout(function () { app.classList.remove('radio-returning'); }, 900);
         }
+        return r;
+    };
+})();
+</script>
+
+<script>
+/* BTS-te click korle je row gulo dekha jay tader serial (--vi) set kore, jate prothom row-ta sathe sathe ashe */
+(function () {
+    var orig = window.showOltBts;
+    if (typeof orig !== 'function') return;
+    window.showOltBts = function () {
+        var r = orig.apply(this, arguments);
+        var i = 0;
+        Array.prototype.forEach.call(document.querySelectorAll('#docs-olt-ip-tbody tr'), function (tr) {
+            if (tr.style.display !== 'none') { tr.style.setProperty('--vi', i++); }
+        });
         return r;
     };
 })();
