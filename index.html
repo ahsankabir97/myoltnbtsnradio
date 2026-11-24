@@ -2684,8 +2684,8 @@ body:not(.show-epon) .docs-grp-epon { display: none !important; }
                     <div class="input-row" style="grid-template-columns:1fr">
                         <div class="field"><div class="lp-label-row"><label for="oltName">OLT Name</label>
                             <div class="lp-fw-tabs show" id="lp-fw-tabs">
-                                <button type="button" class="lp-fw-tab active" id="lp-fw-old" onclick="setLPFw('old')">Old-FW</button>
-                                <button type="button" class="lp-fw-tab" id="lp-fw-up" onclick="setLPFw('up')">Up-FW</button>
+                                <button type="button" class="lp-fw-tab active" id="lp-fw-up" onclick="setLPFw('up')">Up-FW</button>
+                                <button type="button" class="lp-fw-tab" id="lp-fw-old" onclick="setLPFw('old')">Old-FW</button>
                             </div></div>
                             <select id="oltName">
                                 <option value="cdata16">CDATA GPON 16-PON</option>
@@ -3566,6 +3566,7 @@ system\configure# pon on 1 1</code>
 
     // ════ TAB SWITCHING ════
     function switchTab(id, btn) {
+    const _keepOltOpen = !!(btn && btn.classList.contains('nav-child-btn') && window.innerWidth > 700 && document.getElementById('olt-children').classList.contains('open'));
     document.body.classList.remove('docs-mode', 'radio-mode');
     document.getElementById('docs-subnav').classList.remove('open');
     document.getElementById('olt-children').classList.remove('open');
@@ -3577,6 +3578,10 @@ system\configure# pon on 1 1</code>
         document.getElementById(id).classList.add('active');
         document.querySelectorAll('.nav-btn, .nav-child-btn, .nav-group-header').forEach(b => b.classList.remove('active'));
         if (btn) btn.classList.add('active');
+        if (_keepOltOpen) {
+            document.getElementById('olt-children').classList.add('open');
+            document.getElementById('nav-olt-group').classList.add('open');
+        }
         // every tab starts again from its first page
         if (id === 'app-bts') { backToBtsList(); const _b = document.getElementById('app-bts'); if (_b) _b.classList.remove('bts-view-cmd'); if (typeof btsFlyoutClose === 'function') btsFlyoutClose(); }
         closeGears(document.getElementById(id));
@@ -5032,7 +5037,7 @@ script += `onu ${onuId} eth ${i} upstream-rate-limit cir ${vsol_bw} pir ${vsol_b
     }
 
     // ════ LINE PROFILE ════
-    let lpFw = 'old';
+    let lpFw = 'up';
     function setLPFw(mode) {
         lpFw = mode;
         document.getElementById('lp-fw-old').classList.toggle('active', mode === 'old');
@@ -5200,7 +5205,7 @@ script += `onu ${onuId} eth ${i} upstream-rate-limit cir ${vsol_bw} pir ${vsol_b
         if (lpTab && !lpTab.classList.contains('active')) switchTab('app-lp', document.getElementById('nav-lp'));
         const sel = document.getElementById('oltName');
         if (Array.from(sel.options).some(o => o.value === item.olt)) sel.value = item.olt;
-        lpFw = f.fw === 'up' ? 'up' : 'old';
+        lpFw = f.fw === 'old' ? 'old' : 'up';
         document.getElementById('lp-fw-old').classList.toggle('active', lpFw === 'old');
         document.getElementById('lp-fw-up').classList.toggle('active', lpFw === 'up');
         const tabs = document.getElementById('lp-fw-tabs'); if (tabs) tabs.classList.toggle('show', sel.value === 'cdata16');
@@ -6660,8 +6665,11 @@ document.addEventListener('click', function(e) {
     if (insideAnyGroupWrapper || (backdrop && backdrop.contains(e.target)) || (docsSubnav && docsSubnav.contains(e.target))) {
         return;
     }
-    children.classList.remove('open');
-    document.getElementById('nav-olt-group').classList.remove('open');
+    // Desktop: OLT TASK stays open until OLT TASK itself or another nav badge is clicked
+    if (window.innerWidth <= 700) {
+        children.classList.remove('open');
+        document.getElementById('nav-olt-group').classList.remove('open');
+    }
     document.getElementById('nav-docs-group').classList.remove('open');
     // Only auto-close subnav on desktop (mobile has backdrop for that)
     closeDocsSubnav();
@@ -7587,6 +7595,13 @@ document.addEventListener('mouseover', function (e) {
     --sb-active-bg: linear-gradient(90deg, rgba(56, 189, 248, 0.24) 0%, rgba(56, 189, 248, 0.08) 100%) !important;
 }
 
+/* Generated script box = same colour as navigation bar */
+.output-wrap,
+.onu-script-view-box,
+textarea.onu-view-textarea { background: var(--sb-bg) !important; }
+.output-wrap { border-color: var(--sb-border) !important; }
+textarea.onu-view-textarea { background: rgba(0,0,0,0.18) !important; }
+
 /* Main Sidebar */
 .sidebar {
     background: var(--sb-bg) !important;
@@ -8508,6 +8523,18 @@ document.addEventListener('mouseover', function (e) {
     if (back) back.setAttribute('onclick', 'btsBackAnimated()');
 })();
 </script>
+<style>
+/* Generated script boxes = exact navigation bar colour */
+.output-wrap,
+.onu-script-view-box,
+#onu-script-view-modal .onu-modal-box,
+#lp-script-view-modal .onu-modal-box {
+    background: linear-gradient(180deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%) !important;
+    border-color: rgba(255,255,255,0.22) !important;
+}
+textarea.output-area, textarea.onu-view-textarea { background: transparent !important; color: #ffffff !important; }
+textarea.onu-view-textarea { background: rgba(0,0,0,0.14) !important; }
+</style>
 </body>
 </html>
 </div>
