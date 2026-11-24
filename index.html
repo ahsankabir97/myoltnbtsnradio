@@ -2402,22 +2402,22 @@ body:not(.show-epon) .docs-grp-epon { display: none !important; }
                             <div class="docs-sub-group">
                                 <div class="docs-sub-group-header" onclick="toggleSubGroup(this)"><span>EPON UTSTAR</span></div>
                                 <div class="docs-sub-group-items">
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_utstar_troubleshoot', this); closeDocsSubnav();">Troubleshoot</button>
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_utstar_installation', this); closeDocsSubnav();">Installation</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_utstar_troubleshoot', this); docsLeafDone();">Troubleshoot</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_utstar_installation', this); docsLeafDone();">Installation</button>
                                 </div>
                             </div>
                             <div class="docs-sub-group">
                                 <div class="docs-sub-group-header" onclick="toggleSubGroup(this)"><span>EPON PHYHOME</span></div>
                                 <div class="docs-sub-group-items">
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_phyhome_troubleshoot', this); closeDocsSubnav();">Troubleshoot</button>
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_phyhome_installation', this); closeDocsSubnav();">Installation</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_phyhome_troubleshoot', this); docsLeafDone();">Troubleshoot</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_phyhome_installation', this); docsLeafDone();">Installation</button>
                                 </div>
                             </div>
                             <div class="docs-sub-group">
                                 <div class="docs-sub-group-header" onclick="toggleSubGroup(this)"><span>EPON FHNET</span></div>
                                 <div class="docs-sub-group-items">
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_fhnet_troubleshoot', this); closeDocsSubnav();">Troubleshoot</button>
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_fhnet_installation', this); closeDocsSubnav();">Installation</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_fhnet_troubleshoot', this); docsLeafDone();">Troubleshoot</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_fhnet_installation', this); docsLeafDone();">Installation</button>
                                 </div>
                             </div>
                         </div>
@@ -2430,22 +2430,22 @@ body:not(.show-epon) .docs-grp-epon { display: none !important; }
                             <div class="docs-sub-group">
                                 <div class="docs-sub-group-header" onclick="toggleSubGroup(this)"><span>CDATA GPON 16</span></div>
                                 <div class="docs-sub-group-items">
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_cdata_troubleshoot', this); closeDocsSubnav();">Troubleshoot</button>
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_cdata_installation', this); closeDocsSubnav();">Installation</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_cdata_troubleshoot', this); docsLeafDone();">Troubleshoot</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_cdata_installation', this); docsLeafDone();">Installation</button>
                                 </div>
                             </div>
                             <div class="docs-sub-group">
                                 <div class="docs-sub-group-header" onclick="toggleSubGroup(this)"><span>VSOL / ATOP</span></div>
                                 <div class="docs-sub-group-items">
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_vsol_troubleshoot', this); closeDocsSubnav();">Troubleshoot</button>
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_vsol_installation', this); closeDocsSubnav();">Installation</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_vsol_troubleshoot', this); docsLeafDone();">Troubleshoot</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_vsol_installation', this); docsLeafDone();">Installation</button>
                                 </div>
                             </div>
                             <div class="docs-sub-group">
                                 <div class="docs-sub-group-header" onclick="toggleSubGroup(this)"><span>CDATA GPON 8</span></div>
                                 <div class="docs-sub-group-items">
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_gpon8_troubleshoot', this); closeDocsSubnav();">Troubleshoot</button>
-                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_gpon8_installation', this); closeDocsSubnav();">Installation</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_gpon8_troubleshoot', this); docsLeafDone();">Troubleshoot</button>
+                                    <button class="docs-sub-btn docs-sub-btn-leaf" onclick="showDocsContent('d_gpon8_installation', this); docsLeafDone();">Installation</button>
                                 </div>
                             </div>
                         </div>
@@ -4361,6 +4361,13 @@ initRadio();
         if (backdrop) backdrop.classList.remove('open');
         const docsGroupHeader = document.getElementById('nav-docs-group');
         if (docsGroupHeader && window.innerWidth <= 700) docsGroupHeader.classList.remove('open');
+    }
+
+    // after picking a page: mobile dropdown closes, desktop sub menu stays open as it is
+    function docsLeafDone() {
+        if (window.innerWidth <= 700) { closeDocsSubnav(); return; }
+        // desktop: Troubleshoot / Installation flyout closes, the model list (CDATA GPON 16 ...) stays open
+        document.querySelectorAll('#docs-subnav .docs-sub-group-items, #docs-subnav .docs-sub-group-header').forEach(el => el.classList.remove('open'));
     }
 
     function toggleDocsSub(header) {
@@ -6668,9 +6675,11 @@ document.addEventListener('click', function(e) {
         children.classList.remove('open');
         document.getElementById('nav-olt-group').classList.remove('open');
     }
-    document.getElementById('nav-docs-group').classList.remove('open');
-    // Only auto-close subnav on desktop (mobile has backdrop for that)
-    closeDocsSubnav();
+    // Desktop: OLT DOCS sub menu stays open until OLT DOCS or another nav badge is clicked
+    if (window.innerWidth <= 700) {
+        document.getElementById('nav-docs-group').classList.remove('open');
+        closeDocsSubnav();
+    }
 });
 
     // Mobile: dynamically position child panel below the sidebar tab row
@@ -8855,6 +8864,150 @@ textarea.onu-view-textarea { background: rgba(0,0,0,0.14) !important; }
     #olt-bts-detail .ois-body .docs-olt-table td { font-size: 0.86rem; padding: 10px 6px; }
 }
 </style>
+<style>
+/* WEB: sheets also rise from the bottom (like mobile), centred over the page area — sidebar stays visible */
+@media (min-width: 701px) {
+    #oltIpSheetBackdrop, #radioSheetBackdrop { left: var(--sb-w, 237px); }
+    #olt-bts-detail.ois-panel, #radioSheet {
+        top: auto; bottom: 0; left: var(--sb-w, 237px); right: 0;
+        width: min(780px, calc(100vw - var(--sb-w, 237px) - 48px)); margin-left: auto; margin-right: auto;
+        max-height: 72vh; border-radius: 16px 16px 0 0; border: 1px solid #cbd5e1; border-bottom: none;
+        transform: translateY(calc(100% + 80px));
+    }
+    #olt-bts-detail.ois-panel .ois-fab, #radioSheet .ois-fab { left: auto; right: 14px; top: -46px; }
+}
+</style>
+<script>
+(function () {
+    function setSbW() {
+        var sb = document.querySelector('.sidebar');
+        if (!sb || window.innerWidth <= 700) return;
+        var w = sb.getBoundingClientRect().width;
+        if (w > 0) document.documentElement.style.setProperty('--sb-w', Math.round(w) + 'px');
+    }
+    setSbW();
+    window.addEventListener('resize', setSbW);
+    window.addEventListener('load', setSbW);
+    ['oltIpSheetBackdrop', 'radioSheetBackdrop'].forEach(function (id) {
+        var b = document.getElementById(id);
+        if (b) new MutationObserver(setSbW).observe(b, { attributes: true, attributeFilter: ['class'] });
+    });
+})();
+</script>
+<style>
+/* RADIO sheet: nicer client cards (avatar, two-line name, arrow), wider on web */
+@media (min-width: 701px) {
+    #radioSheet { width: min(1020px, calc(100vw - var(--sb-w, 237px) - 40px)); }
+    #radioSheet .rs-body { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px 12px; padding: 14px 16px 18px; align-content: start; }
+    #radioSheet .rs-body > .radio-sub-filter-wrap, #radioSheet .rs-body > .radio-acc-empty { grid-column: 1 / -1; }
+}
+#radioSheet { background: linear-gradient(180deg, #f4f8ff 0%, #eaf3ff 100%); }
+#radioSheet .rs-body { padding-top: 14px; }
+#radioSheet .radio-sub-item {
+    position: relative; gap: 12px; padding: 12px 40px 12px 12px; border-radius: 14px; border: 1px solid #d3e4fb;
+    background: #fff; box-shadow: 0 2px 8px rgba(30,64,175,0.07); overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease;
+}
+#radioSheet .radio-sub-item::before {
+    content: attr(data-ini); flex-shrink: 0; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-weight: 800; font-size: 1rem; color: #fff; text-transform: uppercase;
+    background: linear-gradient(135deg, #0b5a73, #0891b2); box-shadow: 0 4px 10px rgba(8,145,178,0.35);
+    position: static; width: 42px; top: auto; bottom: auto;
+}
+#radioSheet .radio-sub-item:nth-child(4n+3)::before { background: linear-gradient(135deg, #6d28d9, #8b5cf6); box-shadow: 0 4px 10px rgba(124,58,237,0.35); }
+#radioSheet .radio-sub-item:nth-child(4n+4)::before { background: linear-gradient(135deg, #047857, #10b981); box-shadow: 0 4px 10px rgba(16,185,129,0.35); }
+#radioSheet .radio-sub-item:nth-child(4n+5)::before { background: linear-gradient(135deg, #c2410c, #f59e0b); box-shadow: 0 4px 10px rgba(245,158,11,0.35); }
+#radioSheet .radio-sub-item::after {
+    content: '\203A'; position: absolute; right: 14px; top: 50%; transform: translateY(-52%); font-size: 1.7rem; line-height: 1; color: #94b6e4; transition: transform .18s ease, color .18s ease;
+}
+#radioSheet .radio-sub-item:hover { transform: translateY(-2px); border-color: #38bdf8; background: #f7fbff; box-shadow: 0 8px 20px rgba(8,145,178,0.2); }
+#radioSheet .radio-sub-item:hover::after { color: #0891b2; transform: translate(3px, -52%); }
+#radioSheet .radio-sub-item:active { transform: scale(.985); }
+#radioSheet .radio-sub-name { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+#radioSheet .rn-main { font-weight: 800; font-size: 0.95rem; color: #0f2e63; overflow-wrap: anywhere; }
+#radioSheet .rn-sub { font-weight: 600; font-size: 0.78rem; color: #0891b2; margin-top: 2px; overflow-wrap: anywhere; }
+#radioSheet .rn-c { display: none; }
+#radioSheet .radio-sub-item:hover .rn-main { color: #0b5a73; }
+</style>
+<script>
+(function () {
+    var body = document.getElementById('rsBody');
+    if (!body) return;
+    function enhance() {
+        body.querySelectorAll('.radio-sub-item:not([data-ini])').forEach(function (it) {
+            var nm = it.querySelector('.radio-sub-name'); if (!nm) return;
+            var t = nm.textContent.trim();
+            it.setAttribute('data-ini', (t.match(/[A-Za-z0-9]/) || ['•'])[0]);
+            var i = t.indexOf(':');
+            nm.textContent = '';
+            if (i > 0 && i < t.length - 1) {
+                var m = document.createElement('span'); m.className = 'rn-main'; m.appendChild(document.createTextNode(t.slice(0, i)));
+                var c = document.createElement('i'); c.className = 'rn-c'; c.textContent = ':'; m.appendChild(c);
+                var sb = document.createElement('span'); sb.className = 'rn-sub'; sb.textContent = t.slice(i + 1).trim();
+                nm.appendChild(m); nm.appendChild(sb);
+            } else {
+                var one = document.createElement('span'); one.className = 'rn-main'; one.textContent = t; nm.appendChild(one);
+            }
+        });
+    }
+    new MutationObserver(enhance).observe(body, { childList: true });
+    enhance();
+})();
+</script>
+<style>
+/* OLT IP sheet: card layout (same look as RADIO) instead of a plain table */
+@media (min-width: 701px) {
+    #olt-bts-detail.ois-panel { width: min(1020px, calc(100vw - var(--sb-w, 237px) - 40px)); }
+}
+#olt-bts-detail.ois-panel { background: linear-gradient(180deg, #f4f8ff 0%, #eaf3ff 100%); }
+#olt-bts-detail .ois-body { padding: 14px 14px 18px; }
+#olt-bts-detail .ois-body .docs-olt-table { display: block; border: none; background: transparent; margin: 0; border-radius: 0; overflow: visible; }
+#olt-bts-detail .ois-body .docs-olt-table thead { display: none; }
+#olt-bts-detail .ois-body .docs-olt-table tbody { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 701px) {
+    #olt-bts-detail .ois-body .docs-olt-table tbody { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 10px 12px; }
+}
+#olt-bts-detail .ois-body .docs-olt-table tbody tr {
+    display: grid; grid-template-columns: 42px minmax(0, 1fr) auto; grid-template-areas: "av name up" "av ip up";
+    column-gap: 12px; row-gap: 2px; align-items: center; padding: 12px 14px 12px 12px;
+    background: #fff; border: 1px solid #d3e4fb; border-radius: 14px; box-shadow: 0 2px 8px rgba(30,64,175,0.07);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; cursor: default;
+}
+#olt-bts-detail .ois-body .docs-olt-table tbody tr:hover { transform: translateY(-2px); border-color: #38bdf8; background: #f7fbff; box-shadow: 0 8px 20px rgba(8,145,178,0.2); }
+#olt-bts-detail .ois-body .docs-olt-table tbody tr::before {
+    content: attr(data-ini); grid-area: av; width: 42px; height: 42px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+    font-family: 'Orbitron', monospace; font-weight: 800; font-size: 1rem; color: #fff; text-transform: uppercase;
+    background: linear-gradient(135deg, #0b5a73, #0891b2); box-shadow: 0 4px 10px rgba(8,145,178,0.35);
+}
+#olt-bts-detail .ois-body .docs-olt-table tbody tr:nth-child(4n+2)::before { background: linear-gradient(135deg, #6d28d9, #8b5cf6); box-shadow: 0 4px 10px rgba(124,58,237,0.35); }
+#olt-bts-detail .ois-body .docs-olt-table tbody tr:nth-child(4n+3)::before { background: linear-gradient(135deg, #047857, #10b981); box-shadow: 0 4px 10px rgba(16,185,129,0.35); }
+#olt-bts-detail .ois-body .docs-olt-table tbody tr:nth-child(4n+4)::before { background: linear-gradient(135deg, #c2410c, #f59e0b); box-shadow: 0 4px 10px rgba(245,158,11,0.35); }
+#olt-bts-detail .ois-body .docs-olt-table tbody td { border: none !important; padding: 0 !important; background: transparent; text-align: left; }
+#olt-bts-detail .ois-body .docs-olt-table tbody td:nth-child(1) { grid-area: name; font-weight: 800; font-size: 0.98rem; color: #0f2e63; overflow-wrap: anywhere; line-height: 1.25; }
+#olt-bts-detail .ois-body .docs-olt-table tbody td:nth-child(2) { grid-area: ip; font-weight: 700; font-size: 0.92rem; color: #0891b2; }
+#olt-bts-detail .ois-body .docs-olt-table tbody td:nth-child(3) { grid-area: up; text-align: right; font-size: 0.82rem; font-weight: 600; color: #475569; line-height: 1.3; padding-left: 8px !important; border-left: 1px dashed #bfd4f2 !important; }
+#olt-bts-detail .ois-body .docs-olt-table tbody td:nth-child(3)::before { content: 'UPLINK'; display: block; font-size: 0.6rem; letter-spacing: 1.4px; font-weight: 800; color: #94a3b8; margin-bottom: 1px; }
+#olt-bts-detail .ois-body .docs-olt-table td .olt-port { display: block; margin-top: 1px; color: #0b2a6f; font-weight: 800; font-size: 0.86rem; }
+@media (max-width: 700px) {
+    #olt-bts-detail .ois-body .docs-olt-table tbody tr { padding: 11px 12px 11px 10px; column-gap: 10px; }
+    #olt-bts-detail .ois-body .docs-olt-table tbody td:nth-child(1) { font-size: 0.92rem; }
+    #olt-bts-detail .ois-body .docs-olt-table tbody td:nth-child(2) { font-size: 0.86rem; }
+    #olt-bts-detail .ois-body .docs-olt-table tbody td:nth-child(3) { font-size: 0.76rem; }
+}
+</style>
+<script>
+(function () {
+    var tb = document.getElementById('docs-olt-ip-tbody');
+    if (!tb) return;
+    function tag() {
+        Array.prototype.forEach.call(tb.rows, function (r) {
+            if (r.cells[0]) r.setAttribute('data-ini', (r.cells[0].textContent.match(/[A-Za-z0-9]/) || ['•'])[0]);
+        });
+    }
+    new MutationObserver(tag).observe(tb, { childList: true });
+    tag();
+})();
+</script>
 </body>
 </html>
 </div>
