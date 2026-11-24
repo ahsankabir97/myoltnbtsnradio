@@ -8844,6 +8844,17 @@ textarea.onu-view-textarea { background: rgba(0,0,0,0.14) !important; }
     #olt-bts-detail.ois-panel { transform: translateY(calc(100% + var(--mobile-nav-height, 64px) + 80px)); }
 }
 </style>
+<style>
+/* OLT IP panel table: uplink IP on the first line, [port] on the second line — for every BTS; slightly bigger text */
+#olt-bts-detail .docs-olt-table td .olt-port { display: block; margin-top: 2px; line-height: 1.2; color: #0b2a6f; font-weight: 700; }
+#olt-bts-detail .docs-olt-table td:nth-child(3) { line-height: 1.25; }
+#olt-bts-detail .docs-olt-table th { font-size: 0.82rem; }
+#olt-bts-detail .docs-olt-table td { font-size: 0.95rem; }
+@media (max-width: 700px) {
+    #olt-bts-detail .ois-body .docs-olt-table th { font-size: 0.78rem; padding: 10px 6px; }
+    #olt-bts-detail .ois-body .docs-olt-table td { font-size: 0.86rem; padding: 10px 6px; }
+}
+</style>
 </body>
 </html>
 </div>
