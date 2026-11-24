@@ -9166,6 +9166,98 @@ body.radio-mode .main-content {
 /* modal stripe */
 #radioModalOverlay .radio-modal-header::after { background: linear-gradient(90deg, #67e8f9, #a5f3fc, #cffafe); }
 .author-name { color: #5fa8bb; }
+
+/* ════ MOBILE ONLY: smoother transitions + Radio round back button (bottom-right) — web view unchanged ════ */
+@keyframes mRise   { 0% { opacity: 0; transform: translate3d(0, 34px, 0); } 100% { opacity: 1; transform: none; } }
+@keyframes mFade   { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes mFabIn  { 0% { opacity: 0; transform: translate3d(0, 18px, 0) scale(.6); } 100% { opacity: 1; transform: none; } }
+@media (max-width: 700px) {
+    /* softer, longer easing (starts fast, settles slowly) + only transform/opacity animate */
+    .app-wrapper.active, .docs-tab-content.active { animation: mRise .75s cubic-bezier(.16, 1, .3, 1) backwards; }
+    /* Radio holds fixed buttons -> wrapper must not carry a transform: fade the wrapper, rise the content inside */
+    #app-radio.app-wrapper.active { animation: mFade .45s ease-out backwards; }
+    #app-radio.app-wrapper.active .radio-bts-grid { animation: mRise .75s cubic-bezier(.16, 1, .3, 1) backwards; }
+
+    /* no double / bouncy animations on top of the page transition */
+    .radio-detail-card { animation: none !important; }
+    #olt-bts-buttons.olt-bts-grid > .olt-bts-btn,
+    #bts-buttons.olt-bts-grid > .olt-bts-btn,
+    #radioBtsTabs > .radio-bts-cell { animation-duration: .7s; animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+
+    /* client list -> detail page : detail slides up, list fades back when returning */
+    #app-radio.detail-open .radio-detail-body { animation: mRise .7s cubic-bezier(.16, 1, .3, 1) backwards; }
+    #app-radio.detail-open .radio-detail-header { animation: mFade .4s ease-out backwards; }
+    #app-radio.radio-returning .radio-client-panel { animation: mFade .45s ease-out backwards; }
+    #app-radio.radio-returning #radioBtsTabs,
+    #app-radio.radio-returning #radioClientList { animation: mRise .65s cubic-bezier(.16, 1, .3, 1) backwards; }
+
+    /* instant touch response (no 300ms delay) + quick press feedback */
+    button, a, .radio-client-card, .olt-bts-btn, .nav-btn, .nav-child-btn, .nav-group-header { touch-action: manipulation; }
+    .radio-client-card, .olt-bts-btn, .btn { transition-duration: .18s; }
+    .radio-client-card:active, .olt-bts-btn:active { transform: scale(.98); }
+
+    /* ── Radio: round BACK button, bottom-right, above the bottom nav ── */
+    #app-radio .radio-detail-back,
+    #app-radio #radioBackBar .olt-back-btn {
+        position: fixed !important; z-index: 170;
+        right: 16px; left: auto; top: auto;
+        bottom: calc(var(--mobile-nav-height, 60px) + 16px + env(safe-area-inset-bottom, 0px));
+        width: 48px; height: 48px; min-height: 0; padding: 0 !important; margin: 0;
+        border-radius: 50% !important; border: 2px solid rgba(255,255,255,.55) !important;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0 !important; gap: 0;                      /* hides the "Back" word */
+        background: linear-gradient(135deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%) !important;
+        color: #fff !important;
+        box-shadow: 0 8px 20px rgba(6, 90, 115, .45), 0 2px 6px rgba(0, 0, 0, .2);
+        animation: mFabIn .5s cubic-bezier(.16, 1, .3, 1) backwards;
+        transition: transform .18s ease, box-shadow .18s ease;
+    }
+    #app-radio .radio-detail-back .material-icons,
+    #app-radio #radioBackBar .olt-back-btn .material-icons { font-size: 24px !important; line-height: 1; }
+    #app-radio .radio-detail-back:active,
+    #app-radio #radioBackBar .olt-back-btn:active { transform: scale(.9); box-shadow: 0 4px 10px rgba(6, 90, 115, .4); }
+    /* keep last cards clear of the floating button */
+    #app-radio { padding-bottom: 74px; }
+}
+@media (max-width: 700px) and (prefers-reduced-motion: reduce) {
+    .app-wrapper.active, .docs-tab-content.active, #app-radio *, #app-radio { animation: none !important; }
+}
+
+/* ════ MOBILE ONLY: even smoother (slower, softer settle) + smaller Radio back button ════ */
+@keyframes mRiseSoft { 0% { opacity: 0; transform: translate3d(0, 26px, 0); } 100% { opacity: 1; transform: none; } }
+@media (max-width: 700px) {
+    /* heavy blur on the bottom bar re-paints on every scroll/animation frame -> remove (bar is already solid teal) */
+    .sidebar { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; }
+
+    .app-wrapper.active, .docs-tab-content.active { animation: mRiseSoft .95s cubic-bezier(.22, 1, .36, 1) backwards; }
+    #app-radio.app-wrapper.active { animation: mFade .6s ease-out backwards; }
+    #app-radio.app-wrapper.active .radio-bts-grid { animation: mRiseSoft .95s cubic-bezier(.22, 1, .36, 1) backwards; }
+
+    /* detail page: header fades, card header then table rise one after another */
+    #app-radio.detail-open .radio-detail-header { animation: mFade .55s ease-out backwards; }
+    #app-radio.detail-open .radio-detail-body { animation: mFade .5s ease-out backwards; }
+    #app-radio.detail-open .rdc-header { animation: mRiseSoft .85s cubic-bezier(.22, 1, .36, 1) backwards; }
+    #app-radio.detail-open .rdc-table  { animation: mRiseSoft .95s cubic-bezier(.22, 1, .36, 1) .09s backwards; }
+    #app-radio.radio-returning .radio-client-panel { animation: mFade .6s ease-out backwards; }
+    #app-radio.radio-returning #radioBtsTabs,
+    #app-radio.radio-returning #radioClientList { animation: mRiseSoft .85s cubic-bezier(.22, 1, .36, 1) backwards; }
+
+    #olt-bts-buttons.olt-bts-grid > .olt-bts-btn,
+    #bts-buttons.olt-bts-grid > .olt-bts-btn,
+    #radioBtsTabs > .radio-bts-cell { animation-duration: .85s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
+
+    /* smaller round back button */
+    #app-radio .radio-detail-back,
+    #app-radio #radioBackBar .olt-back-btn {
+        width: 38px; height: 38px;
+        right: 14px;
+        bottom: calc(var(--mobile-nav-height, 60px) + 14px + env(safe-area-inset-bottom, 0px));
+        border-width: 1.5px !important;
+        box-shadow: 0 6px 14px rgba(6, 90, 115, .4), 0 1px 4px rgba(0, 0, 0, .18);
+    }
+    #app-radio .radio-detail-back .material-icons,
+    #app-radio #radioBackBar .olt-back-btn .material-icons { font-size: 20px !important; }
+}
 </style>
 
 <script>
@@ -9211,6 +9303,26 @@ body.radio-mode .main-content {
 
     v1.addEventListener('input', function () { if (isVsol()) lp.value = v1.value.replace(/[^0-9]/g, ''); });
     lp.addEventListener('input', function () { if (isVsol()) v1.value = lp.value.replace(/[^0-9]/g, ''); });
+})();
+</script>
+
+<script>
+/* Radio (mobile): client detail theke list-e fire ashle list-ta smooth fade/rise kore */
+(function () {
+    var orig = window.showRadioWelcome;
+    if (typeof orig !== 'function') return;
+    window.showRadioWelcome = function () {
+        var app = document.getElementById('app-radio');
+        var was = app && app.classList.contains('detail-open');
+        var r = orig.apply(this, arguments);
+        if (was && app && window.innerWidth <= 700) {
+            app.classList.remove('radio-returning');
+            void app.offsetWidth;
+            app.classList.add('radio-returning');
+            setTimeout(function () { app.classList.remove('radio-returning'); }, 900);
+        }
+        return r;
+    };
 })();
 </script>
 </body>
