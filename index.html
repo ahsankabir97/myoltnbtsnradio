@@ -3731,16 +3731,14 @@ initRadio();
                     <span class="material-icons">settings_input_antenna</span>
                     <span><span class="obb-name">${escapeHtml(bts.name)}</span><span class="obb-count">${n} radio${n !== 1 ? 's' : ''}</span></span>
                 </button>
-                <div class="radio-pop">${radioPopItemsHtml(id)}</div>
-            </div>`;
+            </div><div class="radio-pop" data-for="${eid}">${radioPopItemsHtml(id)}</div>`;
         });
         parts.push(`<div class="radio-bts-cell radio-deleted-cell${radioPopId === RADIO_DELETED_ID ? ' pop-open' : ''}" data-id="${RADIO_DELETED_ID}">
             <button type="button" class="olt-bts-btn radio-deleted-btn" onclick="toggleRadioPop('${RADIO_DELETED_ID}')">
                 <span class="material-icons">delete</span>
                 <span><span class="obb-name"><i class="fa-solid fa-trash-can" style="font-size:0.85em"></i> Deleted Radio</span><span class="obb-count">${radioDeleted.length} radio${radioDeleted.length !== 1 ? 's' : ''}</span></span>
             </button>
-            <div class="radio-pop">${radioPopItemsHtml(RADIO_DELETED_ID)}</div>
-        </div>`);
+        </div><div class="radio-pop" data-for="${RADIO_DELETED_ID}">${radioPopItemsHtml(RADIO_DELETED_ID)}</div>`);
         tabs.innerHTML = parts.join('');
         applyRadioView();
         if (radioPopId) positionRadioPop();
@@ -3785,7 +3783,7 @@ initRadio();
         }
     }
     window.addEventListener('scroll', () => { if (radioPopId) positionRadioPop(); }, true);
-    document.addEventListener('click', e => { if (radioPopId && !e.target.closest('#radioBtsTabs .radio-bts-cell')) closeRadioPop(); });
+    document.addEventListener('click', e => { if (radioPopId && !e.target.closest('#radioBtsTabs .radio-bts-cell, #radioBtsTabs .radio-pop')) closeRadioPop(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeRadioPop(); });
     window.addEventListener('resize', () => { if (radioPopId) positionRadioPop(); });
 
@@ -8534,6 +8532,317 @@ textarea.onu-view-textarea { background: rgba(0,0,0,0.18) !important; }
 }
 textarea.output-area, textarea.onu-view-textarea { background: transparent !important; color: #ffffff !important; }
 textarea.onu-view-textarea { background: rgba(0,0,0,0.14) !important; }
+</style>
+<style>
+/* ════ RADIO: BTS list opens as BOTTOM SHEET (mobile) / SIDE PANEL (web) ════ */
+#app-radio #radioBtsTabs > .radio-pop { display: none !important; }
+#radioSheetBackdrop { position: fixed; inset: 0; z-index: 9000; background: rgba(8,28,48,0.5); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+#radioSheetBackdrop.open { opacity: 1; pointer-events: auto; }
+#radioSheet {
+    position: fixed; z-index: 9001; display: flex; flex-direction: column; background: #f4f8ff; color: #1e3a8a;
+    box-shadow: 0 0 40px rgba(5,25,45,0.45); pointer-events: none;
+    transition: transform .3s cubic-bezier(.22,.7,.2,1);
+}
+#radioSheet.open { pointer-events: auto; transform: none !important; }
+.rs-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; color: #fff; flex-shrink: 0;
+    background: linear-gradient(135deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%); }
+.rs-ico { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rs-ico .material-icons { font-size: 20px; }
+.rs-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.rs-name { font-family: 'Orbitron', monospace; font-weight: 800; font-size: 0.86em; letter-spacing: 1.4px; overflow-wrap: anywhere; }
+.rs-count { font-family: 'Exo 2', sans-serif; font-size: 0.74em; opacity: .85; margin-top: 2px; }
+.rs-close { width: 36px; height: 36px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rs-close:hover { background: rgba(255,255,255,0.35); }
+.rs-grab { display: none; width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.55); margin: 8px auto 0; flex-shrink: 0; }
+.rs-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 10px; display: flex; flex-direction: column; gap: 6px; -webkit-overflow-scrolling: touch; }
+#radioSheet .radio-sub-filter-wrap { position: sticky; top: 0; z-index: 2; background: #f4f8ff; padding-bottom: 6px; margin: 0; }
+#radioSheet .radio-sub-filter-wrap .material-icons { position: absolute; left: 11px; top: 50%; transform: translateY(-65%); font-size: 18px; color: #2563eb; pointer-events: none; }
+#radioSheet .radio-sub-filter { width: 100%; box-sizing: border-box; padding: 11px 12px 11px 36px; border-radius: 10px; border: 1px solid #93c5fd; background: #fff; color: #1e3a8a; font-family: 'Exo 2', sans-serif; font-size: 16px; outline: none; }
+#radioSheet .radio-sub-filter:focus { border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+#radioSheet .radio-sub-item { display: flex; align-items: center; padding: 14px 14px; border-radius: 10px; background: #fff; border: 1px solid #dbeafe; cursor: pointer; color: #1e3a8a; font-weight: 700; font-family: 'Exo 2', sans-serif; font-size: 0.92em; transition: background .15s, border-color .15s; }
+#radioSheet .radio-sub-item:hover, #radioSheet .radio-sub-item:active { background: #dbeafe; border-color: #93c5fd; }
+#radioSheet .radio-acc-empty { padding: 16px; text-align: center; color: #64748b; font-size: 13px; }
+/* WEB: side panel from the right */
+@media (min-width: 701px) {
+    #radioSheet { top: 0; right: 0; bottom: 0; width: 400px; max-width: 92vw; transform: translateX(105%); border-radius: 16px 0 0 16px; }
+}
+/* MOBILE: bottom sheet */
+@media (max-width: 700px) {
+    #radioSheet { left: 0; right: 0; bottom: 0; max-height: 78vh; transform: translateY(105%); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); background: #f4f8ff; }
+    #radioSheet .rs-grab { display: block; }
+    .rs-head { border-radius: 18px 18px 0 0; padding-top: 6px; flex-wrap: wrap; }
+    .rs-grab { flex-basis: 100%; margin: 4px auto 6px; }
+}
+</style>
+<script>
+(function () {
+    var backdrop = document.createElement('div'); backdrop.id = 'radioSheetBackdrop';
+    var sheet = document.createElement('div'); sheet.id = 'radioSheet';
+    sheet.innerHTML = '<div class="rs-head"><div class="rs-grab"></div><div class="rs-ico"><span class="material-icons">settings_input_antenna</span></div>' +
+        '<div class="rs-txt"><span class="rs-name" id="rsName"></span><span class="rs-count" id="rsCount"></span></div>' +
+        '<button type="button" class="rs-close" id="rsClose" aria-label="Close"><span class="material-icons">close</span></button></div>' +
+        '<div class="rs-body radio-pop" id="rsBody"></div>';
+    document.body.appendChild(backdrop); document.body.appendChild(sheet);
+
+    function openSheet(id) {
+        var isDel = (id === RADIO_DELETED_ID);
+        var name = isDel ? 'Deleted Radio' : (radioData[id] ? radioData[id].name : '');
+        var n = isDel ? radioDeleted.length : (radioData[id] ? radioData[id].clients.length : 0);
+        document.getElementById('rsName').textContent = name;
+        document.getElementById('rsCount').textContent = n + ' radio' + (n !== 1 ? 's' : '');
+        var body = document.getElementById('rsBody');
+        body.innerHTML = radioPopItemsHtml(id);
+        body.scrollTop = 0;
+        backdrop.classList.add('open'); sheet.classList.add('open');
+    }
+    function closeSheet() { backdrop.classList.remove('open'); sheet.classList.remove('open'); }
+
+    backdrop.addEventListener('click', function () { if (typeof closeRadioPop === 'function') closeRadioPop(); closeSheet(); });
+    document.getElementById('rsClose').addEventListener('click', function (e) { e.stopPropagation(); if (typeof closeRadioPop === 'function') closeRadioPop(); closeSheet(); });
+    sheet.addEventListener('click', function (e) {
+        if (e.target.closest('.radio-sub-item')) { if (typeof closeRadioPop === 'function') closeRadioPop(); closeSheet(); }
+        e.stopPropagation();
+    });
+
+    window.positionRadioPop = function () {};
+    var origToggle = window.toggleRadioPop;
+    window.toggleRadioPop = function (id) {
+        origToggle(id);
+        if (radioPopId) openSheet(radioPopId); else closeSheet();
+    };
+    var origClose = window.closeRadioPop;
+    window.closeRadioPop = function () { origClose(); closeSheet(); };
+    // list re-rendered while sheet is open (e.g. after edit) -> keep it in sync
+    var origRender = window.renderRadioBtsTabs;
+    if (typeof origRender === 'function') window.renderRadioBtsTabs = function () {
+        origRender.apply(this, arguments);
+        if (sheet.classList.contains('open')) { if (radioPopId) openSheet(radioPopId); else closeSheet(); }
+    };
+})();
+</script>
+<style>
+/* ════ OLT IP INFO: BTS details open as SIDE PANEL (web) / BOTTOM SHEET (mobile) ════ */
+#oltIpSheetBackdrop { position: fixed; inset: 0; z-index: 9000; background: rgba(8,28,48,0.5); opacity: 0; pointer-events: none; transition: opacity .25s ease; }
+#oltIpSheetBackdrop.open { opacity: 1; pointer-events: auto; }
+#olt-bts-detail.ois-panel {
+    display: flex !important; flex-direction: column; position: fixed; z-index: 9001; margin: 0; padding: 0;
+    background: #f4f8ff; box-shadow: 0 0 40px rgba(5,25,45,0.45);
+    visibility: hidden; pointer-events: none; transition: transform .3s cubic-bezier(.22,.7,.2,1), visibility 0s linear .3s;
+}
+#olt-bts-detail.ois-panel.ois-open { visibility: visible; pointer-events: auto; transform: none !important; transition: transform .3s cubic-bezier(.22,.7,.2,1), visibility 0s; }
+.ois-head { display: flex; align-items: center; gap: 10px; padding: 12px 14px; color: #fff; flex-shrink: 0; flex-wrap: wrap; margin: 0 !important;
+    background: linear-gradient(135deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%); }
+.ois-grab { display: none; flex-basis: 100%; width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.55); margin: 0 auto; }
+.ois-ico { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ois-ico .material-icons { font-size: 20px; }
+.ois-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+#olt-bts-detail .ois-head .olt-detail-title { color: #fff; font-family: 'Orbitron', monospace; font-weight: 800; font-size: 0.86rem; letter-spacing: 1.2px; overflow-wrap: anywhere; }
+.ois-count { font-family: 'Exo 2', sans-serif; font-size: 0.74rem; opacity: .85; margin-top: 2px; }
+.ois-tools { display: flex; gap: 6px; flex-shrink: 0; }
+.ois-tool, .ois-close { width: 34px; height: 34px; border-radius: 50%; border: none; background: rgba(255,255,255,0.2); color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 13px; flex-shrink: 0; }
+.ois-tool:hover, .ois-close:hover { background: rgba(255,255,255,0.35); }
+.ois-tool.edit.active { background: #38bdf8; color: #0b3d5c; }
+.ois-tool.del.active { background: #f87171; color: #fff; }
+.ois-hint { display: none; margin: 8px 10px 0; padding: 7px 10px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; font-family: 'Exo 2', sans-serif; flex-shrink: 0; }
+.ois-hint.edit { display: block; background: rgba(14,107,168,0.12); color: #0b5a73; }
+.ois-hint.del { display: block; background: rgba(220,38,38,0.12); color: #b91c1c; }
+.ois-body { flex: 1; overflow: auto; overscroll-behavior: contain; padding: 4px 10px 14px; -webkit-overflow-scrolling: touch; }
+.ois-body .docs-olt-table { margin-top: 8px; }
+#olt-bts-buttons .olt-bts-btn.olt-sel { border-color: #67e8f9 !important; box-shadow: 0 6px 18px rgba(8,145,178,0.45) !important; }
+@media (min-width: 701px) {
+    #olt-bts-detail.ois-panel { top: 0; right: 0; bottom: 0; width: 460px; max-width: 94vw; transform: translateX(105%); border-radius: 16px 0 0 16px; }
+}
+@media (max-width: 700px) {
+    #olt-bts-detail.ois-panel { left: 0; right: 0; bottom: 0; max-height: 80vh; transform: translateY(105%); border-radius: 18px 18px 0 0; padding-bottom: env(safe-area-inset-bottom, 0px); }
+    .ois-head { border-radius: 18px 18px 0 0; padding-top: 6px; }
+    .ois-grab { display: block; }
+    .ois-body .docs-olt-table th, .ois-body .docs-olt-table td { padding: 9px 8px; font-size: 0.78rem; }
+}
+#oltIpModalOverlay { z-index: 9100 !important; }
+</style>
+<script>
+(function () {
+    var detail = document.getElementById('olt-bts-detail');
+    if (!detail || typeof showOltBts !== 'function') return;
+    var table = detail.querySelector('.docs-olt-table');
+    var oldHead = detail.querySelector('.olt-detail-head');
+
+    // ---- build panel: header (title, count, tools, close) + scrolling body with the real table ----
+    var head = document.createElement('div'); head.className = 'olt-detail-head ois-head';
+    head.innerHTML = '<div class="ois-grab"></div><div class="ois-ico"><span class="material-icons">router</span></div>' +
+        '<div class="ois-txt"><span class="olt-detail-title" id="olt-detail-title"></span><span class="ois-count" id="ois-count"></span></div>' +
+        '<div class="ois-tools"><button type="button" class="ois-tool add" id="ois-add" title="Add"><i class="fa-solid fa-plus"></i></button>' +
+        '<button type="button" class="ois-tool edit" id="ois-edit" title="Edit"><i class="fa-solid fa-pen"></i></button>' +
+        '<button type="button" class="ois-tool del" id="ois-del" title="Delete"><i class="fa-solid fa-trash"></i></button></div>' +
+        '<button type="button" class="ois-close" id="ois-close" aria-label="Close"><span class="material-icons">close</span></button>';
+    var hint = document.createElement('div'); hint.className = 'ois-hint'; hint.id = 'ois-hint';
+    var body = document.createElement('div'); body.className = 'ois-body';
+    if (oldHead) oldHead.remove();
+    detail.insertBefore(body, detail.firstChild);
+    if (table) body.appendChild(table);
+    detail.insertBefore(hint, body);
+    detail.insertBefore(head, hint);
+    detail.classList.add('ois-panel');
+    document.body.appendChild(detail);                       // body level: fixed positioning is never affected by page animations
+
+    var backdrop = document.createElement('div'); backdrop.id = 'oltIpSheetBackdrop';
+    document.body.appendChild(backdrop);
+
+    function visibleRows() { var n = 0; Array.prototype.forEach.call(document.querySelectorAll('#docs-olt-ip-tbody tr'), function (r) { if (r.style.display !== 'none') n++; }); return n; }
+    function syncHeader() {
+        var t = document.getElementById('olt-detail-title'); if (t && currentOltBts) t.textContent = currentOltBts;
+        var n = visibleRows(); document.getElementById('ois-count').textContent = n + ' OLT' + (n !== 1 ? 's' : '');
+    }
+    function mark(name) {
+        document.querySelectorAll('#olt-bts-buttons .olt-bts-btn').forEach(function (b) { b.classList.toggle('olt-sel', !!name && b.getAttribute('data-bts') === name); });
+    }
+    function open() { backdrop.classList.add('open'); detail.classList.add('ois-open'); }
+    function close() { backdrop.classList.remove('open'); detail.classList.remove('ois-open'); }
+
+    // ---- replace open / close ----
+    var prevShow = window.showOltBts;
+    window.showOltBts = function (name) {
+        if (!currentOltBts && oltToolMode) return prevShow.apply(this, arguments);   // BTS rename / delete modes keep the original behaviour
+        currentOltBts = name;
+        filterOltRows(name);
+        setOltToolMode(null);
+        syncHeader(); mark(name);
+        body.scrollTop = 0;
+        open();
+    };
+    window.backToOltBtsList = function () {
+        currentOltBts = null;
+        close(); mark(null);
+        setOltToolMode(null);
+        var b = document.getElementById('olt-bts-buttons'); if (b) b.style.display = '';
+    };
+
+    // ---- tools inside the panel ----
+    document.getElementById('ois-add').addEventListener('click', function () { oltToolAdd(); });
+    document.getElementById('ois-edit').addEventListener('click', function () { oltToolEdit(); });
+    document.getElementById('ois-del').addEventListener('click', function () { oltToolDel(); });
+    document.getElementById('ois-close').addEventListener('click', function () { backToOltBtsList(); });
+    backdrop.addEventListener('click', function () { backToOltBtsList(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && detail.classList.contains('ois-open')) backToOltBtsList(); });
+
+    var prevMode = window.setOltToolMode;
+    window.setOltToolMode = function (mode) {
+        prevMode.apply(this, arguments);
+        var e = document.getElementById('ois-edit'), d = document.getElementById('ois-del'), h = document.getElementById('ois-hint');
+        if (e) e.classList.toggle('active', mode === 'edit');
+        if (d) d.classList.toggle('active', mode === 'del');
+        if (h) {
+            var inPanel = !!currentOltBts && !!mode;
+            h.className = 'ois-hint' + (inPanel ? ' ' + mode : '');
+            h.textContent = !inPanel ? '' : (mode === 'edit' ? 'Edit mode: je OLT edit korben oi row te click korun' : 'Delete mode: je OLT delete korben oi row te click korun');
+        }
+    };
+
+    // ---- keep header in sync after add / edit / delete ----
+    var prevRefresh = window.refreshOltIpView;
+    if (typeof prevRefresh === 'function') window.refreshOltIpView = function () {
+        prevRefresh.apply(this, arguments);
+        if (currentOltBts) syncHeader();
+    };
+})();
+</script>
+<style>
+/* OLT IP panel header: only the X (and OLT count) — no icon, BTS name or tool buttons */
+.ois-head .ois-ico, .ois-head .ois-tools, #olt-bts-detail .ois-head .olt-detail-title { display: none !important; }
+.ois-head { padding: 8px 12px !important; min-height: 0; }
+.ois-head .ois-count { margin: 0; font-size: 0.82rem; font-weight: 700; opacity: 1; }
+.ois-head .ois-close { margin-left: auto; width: 32px; height: 32px; }
+</style>
+<style>
+/* OLT IP panel: no heading — only a floating round back button; mobile sheet stops above the bottom nav bar */
+#olt-bts-detail.ois-panel .ois-head { display: none !important; }
+#olt-bts-detail.ois-panel .ois-fab {
+    position: absolute; z-index: 3; width: 42px; height: 42px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.85); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: #fff; padding: 0;
+    background: linear-gradient(135deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%);
+    box-shadow: 0 6px 18px rgba(5,25,45,0.4);
+}
+#olt-bts-detail.ois-panel .ois-fab:active { transform: scale(.94); }
+#olt-bts-detail.ois-panel .ois-fab .material-icons { font-size: 22px; }
+#olt-bts-detail.ois-panel .ois-body { padding-top: 8px; }
+@media (min-width: 701px) {
+    #olt-bts-detail.ois-panel .ois-fab { left: -54px; top: 16px; }
+}
+@media (max-width: 700px) {
+    #oltIpSheetBackdrop { bottom: var(--mobile-nav-height, 64px); }
+    #olt-bts-detail.ois-panel {
+        bottom: var(--mobile-nav-height, 64px); padding-bottom: 0;
+        max-height: calc(100vh - var(--mobile-nav-height, 64px) - 70px);
+        border-radius: 16px 16px 0 0; border: 1px solid #cbd5e1; border-bottom: none;
+    }
+    #olt-bts-detail.ois-panel .ois-fab { right: 12px; top: -52px; }
+}
+</style>
+<script>
+(function () {
+    var detail = document.getElementById('olt-bts-detail');
+    var btn = document.getElementById('ois-close');
+    if (!detail || !btn) return;
+    btn.classList.add('ois-fab');
+    btn.setAttribute('aria-label', 'Back');
+    btn.innerHTML = '<span class="material-icons">arrow_back</span>';
+    detail.appendChild(btn);                        // out of the (hidden) heading -> floats beside the panel
+    // tapping the bottom/side navigation closes the panel
+    var sb = document.querySelector('.sidebar');
+    if (sb) sb.addEventListener('click', function () { if (detail.classList.contains('ois-open')) backToOltBtsList(); }, true);
+})();
+</script>
+<style>
+/* smaller floating back button (OLT IP + RADIO) */
+#olt-bts-detail.ois-panel .ois-fab, #radioSheet .ois-fab { width: 36px; height: 36px; }
+#olt-bts-detail.ois-panel .ois-fab .material-icons, #radioSheet .ois-fab .material-icons { font-size: 17px; }
+#olt-bts-detail.ois-panel .ois-fab { top: -46px; }
+@media (min-width: 701px) { #olt-bts-detail.ois-panel .ois-fab { top: 16px; left: -48px; } }
+
+/* RADIO: same look as OLT IP — no heading, floating round back button, sheet stops above the bottom nav */
+#radioSheet .rs-head { display: none !important; }
+#radioSheet .ois-fab {
+    position: absolute; z-index: 3; border-radius: 50%; border: 2px solid rgba(255,255,255,0.85); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; color: #fff; padding: 0;
+    background: linear-gradient(135deg, #0b5a73 0%, #0a7893 55%, #0891b2 100%);
+    box-shadow: 0 6px 18px rgba(5,25,45,0.4);
+}
+#radioSheet .ois-fab:active { transform: scale(.94); }
+#radioSheet .rs-body { padding-top: 10px; }
+@media (min-width: 701px) {
+    #radioSheet .ois-fab { left: -48px; top: 16px; }
+}
+@media (max-width: 700px) {
+    #radioSheetBackdrop { bottom: var(--mobile-nav-height, 64px); }
+    #radioSheet {
+        bottom: var(--mobile-nav-height, 64px); padding-bottom: 0;
+        max-height: calc(100vh - var(--mobile-nav-height, 64px) - 70px);
+        border-radius: 16px 16px 0 0; border: 1px solid #cbd5e1; border-bottom: none;
+    }
+    #radioSheet .ois-fab { right: 12px; top: -46px; }
+}
+</style>
+<script>
+(function () {
+    var sheet = document.getElementById('radioSheet');
+    var btn = document.getElementById('rsClose');
+    if (!sheet || !btn) return;
+    btn.className = 'ois-fab';
+    btn.setAttribute('aria-label', 'Back');
+    btn.innerHTML = '<span class="material-icons">arrow_back</span>';
+    sheet.appendChild(btn);
+    var sb = document.querySelector('.sidebar');
+    if (sb) sb.addEventListener('click', function () { if (sheet.classList.contains('open') && typeof closeRadioPop === 'function') closeRadioPop(); }, true);
+})();
+</script>
+<style>
+/* closed sheets must be completely hidden (no peeking above the bottom nav) */
+#radioSheet { visibility: hidden; transition: transform .3s cubic-bezier(.22,.7,.2,1), visibility 0s linear .3s; }
+#radioSheet.open { visibility: visible; transition: transform .3s cubic-bezier(.22,.7,.2,1), visibility 0s; }
+@media (max-width: 700px) {
+    #radioSheet { transform: translateY(calc(100% + var(--mobile-nav-height, 64px) + 80px)); }
+    #olt-bts-detail.ois-panel { transform: translateY(calc(100% + var(--mobile-nav-height, 64px) + 80px)); }
+}
 </style>
 </body>
 </html>
