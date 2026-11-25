@@ -9380,6 +9380,56 @@ body.radio-mode .main-content {
     };
 })();
 </script>
+<style>
+/* ════ OLT IP INFO: top-right ⚙ stays usable while the BTS panel is open ════ */
+.olt-tools.olt-gear-lifted { position: fixed !important; z-index: 9500; margin: 0 !important; }
+.olt-tools.olt-gear-lifted > .gear-tools-items { background: #ffffff; box-shadow: 0 6px 18px rgba(5,25,45,0.35); }
+.olt-gear-ph { visibility: hidden; flex-shrink: 0; }
+#docs-olt-ip-tbody.mode-edit tr, #docs-olt-ip-tbody.mode-del tr { cursor: pointer; }
+</style>
+<script>
+(function () {
+    var detail = document.getElementById('olt-bts-detail');
+    var tools = document.querySelector('#d_olt_ips .docs-card-header .olt-tools');
+    if (!detail || !tools) return;
+    var ph = null, home = null;
+
+    function place() {
+        if (!ph) return;
+        var r = ph.getBoundingClientRect();
+        var right = window.innerWidth - r.right;
+        if (window.innerWidth > 700) {                         // desktop: side panel on the right -> sit left of it
+            var panelW = Math.min(460, window.innerWidth * 0.94);
+            right = Math.max(right, panelW + 64);
+        }
+        tools.style.top = r.top + 'px';
+        tools.style.right = right + 'px';
+    }
+    function lift() {
+        if (ph) return;
+        var r = tools.getBoundingClientRect();
+        home = tools.parentNode;
+        ph = document.createElement('span'); ph.className = 'olt-gear-ph';
+        ph.style.width = r.width + 'px'; ph.style.height = r.height + 'px';
+        home.insertBefore(ph, tools);
+        document.body.appendChild(tools);
+        tools.classList.add('olt-gear-lifted');
+        place();
+    }
+    function drop() {
+        if (!ph) return;
+        tools.classList.remove('olt-gear-lifted');
+        tools.style.top = ''; tools.style.right = '';
+        home.insertBefore(tools, ph);
+        ph.remove(); ph = null;
+    }
+    function sync() { detail.classList.contains('ois-open') ? lift() : drop(); }
+
+    new MutationObserver(sync).observe(detail, { attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', place);
+    sync();
+})();
+</script>
 </body>
 </html>
 </div>
